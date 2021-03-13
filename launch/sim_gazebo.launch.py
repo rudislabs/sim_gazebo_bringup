@@ -42,8 +42,13 @@ for repo in setup_gazebo["gazebo_models"]:
             gazebo_repo["version"],gazebo_repo["repo"], gazebo_repo_path)
         clone_cmd_popen=shlex.split(clone_cmd)
         clone_popen = subprocess.Popen(clone_cmd_popen, 
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        clone_out, clone_err = clone_popen.communicate()
+            stdout=subprocess.PIPE, text=True)
+        while True:
+            output = clone_popen.stdout.readline()
+            if output == '' and clone_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
         clone_popen.wait()
     if '{:s}/models'.format(gazebo_repo_path) not in os.environ['GAZEBO_MODEL_PATH']:
         os.environ['GAZEBO_MODEL_PATH'] = '{:s}/models:{:s}'.format(
@@ -57,21 +62,31 @@ for build in setup_autopilot:
         autopilot_build["build_type"])
     if (not os.path.isdir(autopilot_path)) and (autopilot_build["clone"]):
         clone_cmd = 'git clone -b {:s} {:s} {:s}'.format(
-            setup_autopilot["version"],autopilot_build["repo"], autopilot_path)
+            autopilot_build["version"],autopilot_build["repo"], autopilot_path)
         clone_cmd_popen=shlex.split(clone_cmd)
         clone_popen = subprocess.Popen(clone_cmd_popen, 
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        clone_out, clone_err = clone_popen.communicate()
+            stdout=subprocess.PIPE, text=True)
+        while True:
+            output = clone_popen.stdout.readline()
+            if output == '' and clone_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
         clone_popen.wait()
 
     if (os.path.isdir(autopilot_path)) and (not os.path.isdir(autopilot_build_path)):
-        build_cmd = 'cd {:s} && make clean && {:s} {:s} {:s}'.format(
-            autopilot_path, autopilot_build["build_prefix"],
-            autopilot_build["build_type"], autopilot_build["build_postfix"])
+        build_cmd = 'make clean && DONT_RUN=1 make {:s} {:s} {:s}'.format(
+            autopilot_build["build_prefix"],autopilot_build["build_type"],
+            autopilot_build["build_postfix"])
         build_cmd_popen=shlex.split(build_cmd)
         build_popen = subprocess.Popen(build_cmd_popen, stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE, text=True)
-        build_out, build_err = build_popen.communicate()
+            cwd=autopilot_path, text=True)
+        while True:
+            output = build_popen.stdout.readline()
+            if output == '' and build_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
         build_popen.wait()
 
     if '{:s}/build_gazebo'.format(autopilot_build_path) not in os.environ['LD_LIBRARY_PATH']:
@@ -95,14 +110,18 @@ if world_params["generate_world"]:
         generate_world_args += ' --{:s} "{:s}"'.format(params, 
             str(generate_world_params[params]))
 
-    generate_world_cmd = ['python3 {:s}/{:s}/scripts/jinja_world_gen.py{:s}'.format(
+    generate_world_cmd = 'python3 {:s}/{:s}/scripts/jinja_world_gen.py{:s}'.format(
         ros_ws, world_params["gazebo_name"], generate_world_args
-        ).replace("\n","").replace("    ","")]
+        ).replace("\n","").replace("    ","")
 
     world_cmd_popen=shlex.split(generate_world_cmd)
-    world_popen = subprocess.Popen(world_cmd_popen, stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE, text=True)
-    world_out, world_err = world_popen.communicate()
+    world_popen = subprocess.Popen(world_cmd_popen, stdout=subprocess.PIPE, text=True)
+    while True:
+        output = world_popen.stdout.readline()
+        if output == '' and world_popen.poll() is not None:
+            break
+        if output:
+            print(output.strip())
     world_popen.wait()
 
     world_file_path='/tmp/{:s}.world'.format(generate_world_params["world_name"])
@@ -172,8 +191,9 @@ def generate_launch_description():
         # Set each xterm with PX4 environment variables
         px4_env = '''export PX4_SIM_MODEL=\"{:s}\"; export PX4_HOME_LAT={:s}; 
                         export PX4_HOME_LON={:s}; export PX4_HOME_ALT={:s};'''.format(
-                        base_model, str(latitude_vehicle), str(longitude_vehicle), 
-                        str(altitude_vehicle)).replace("\n","").replace("    ","")
+                        generate_model_params["base_model"], str(latitude_vehicle), 
+                        str(longitude_vehicle), str(altitude_vehicle)
+                        ).replace("\n","").replace("    ","")
 
         # Set path for PX4 build
         px4_path = '{:s}/{:s}/build/{:s}'.format(ros_ws,
