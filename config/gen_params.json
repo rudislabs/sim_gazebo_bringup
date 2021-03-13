@@ -1,0 +1,103 @@
+{	"setup":{
+		"autopilot": {
+			"autopilot_build_params_0": {
+				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
+				"name": "TII-Autopilot",
+				"version": "tii_v1",
+				"clone": 1,
+				"build_type": "px4_sitl_default",
+				"build_prefix": "DONT_RUN=1",
+				"build_postfix": "gazebo"
+			},
+			"autopilot_build_params_1": {
+				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
+				"name": "NXP-Autopilot",
+				"version": "pr-cupcar",
+				"clone": 1,
+				"build_type": "px4_sitl_rtps",
+				"build_prefix": "DONT_RUN=1",
+				"build_postfix": "gazebo"
+			}
+		},
+		"gazebo": {
+			"gazebo_models": {
+				"gazebo_repo_0":{
+					"repo": "git@github.com:rudislabs/tii_gazebo.git",
+					"version": "main",
+					"name": "tii_gazebo"
+				},
+				"gazebo_repo_1":{
+					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
+					"version": "ros2",
+					"name": "nxp_gazebo"
+				}
+			}
+		}
+	},
+	"world_params": {
+		"gazebo_name": "tii_gazebo",
+		"generate_world": 1,
+		"generate_params":{
+			"sdf_version": "NotSet",
+			"sun_model": "sunSolarNoon",
+			"sun_utc_date": "1904_09_20_17_30",
+			"cloud_speed": "NoClouds",
+			"shadows": 1,
+			"video_widget": "NotSet",
+			"update_rate": 250,
+			"wind_speed": "NotSet",
+			"realtime_factor": 1.0,
+			"world_name": "empty",
+			"ambient_light": 0.5,
+			"background_light": 0.15,
+			"spherical_coords": 1,
+			"latitude": 39.8039,
+			"longitude": -84.0606,
+			"altitude": 244,
+			"irlock_beacon_pose": "NotSet",
+			"ode_threads": 2
+		}
+	},
+	"models": {
+		"model_params_0": {
+			"gazebo_name": "tii_gazebo",
+			"autopilot_name": "TII-Autopilot",
+			"autopilot_build_type": "px4_sitl_default",
+			"spawn_pose": [0, 0, 1, 0, 0, 0],
+			"generate_params":{
+				"base_model": "iris",
+				"sdf_version": "NotSet",
+				"mavlink_tcp_port": 4560,
+				"mavlink_udp_port": 14560,
+				"qgc_udp_port": 14550,
+				"sdk_udp_port": 14540,
+				"serial_enabled": 0,
+				"serial_device": "/dev/ttyACM0",
+				"serial_baudrate": 921600,
+				"enable_lockstep": 1,
+				"hil_mode": 0,
+				"model_name": "NotSet"
+			}
+		},
+		"model_params_1": {
+			"gazebo_name": "tii_gazebo",
+			"autopilot_name": "TII-Autopilot",
+			"autopilot_build_type": "px4_sitl_default",
+			"spawn_pose": [0, 2, 1, 0, 0, 0],
+			"generate_params":{
+				"base_model": "standard_vtol",
+				"sdf_version": "NotSet",
+				"mavlink_tcp_port": 4561,
+				"mavlink_udp_port": 14561,
+				"qgc_udp_port": 14551,
+				"sdk_udp_port": 14541,
+				"serial_enabled": 0,
+				"serial_device": "/dev/ttyACM0",
+				"serial_baudrate": 921600,
+				"enable_lockstep": 1,
+				"hil_mode": 0,
+				"model_name": "NotSet"
+			}
+		}
+	}
+}
