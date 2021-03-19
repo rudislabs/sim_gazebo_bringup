@@ -2,12 +2,10 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import SetLaunchConfiguration
-from launch.actions import SetEnvironmentVariable
 from launch.actions import IncludeLaunchDescription
 from launch.actions import ExecuteProcess
 from launch.actions import LogInfo
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import EnvironmentVariable
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 import os
@@ -15,18 +13,24 @@ from time import sleep
 import json
 import numpy as np
 import shlex
+import sys
 import subprocess
 
 
 launch_path = os.path.realpath(__file__).replace("sim_gazebo.launch.py","")
 json_path = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../config")))
-ros_ws = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../../..")))
+ros2_ws = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../../..")))
+gazebo_model_reset_env=False
+gazebo_plugin_reset_env=False
+built_ros2_pkgs=False
+
 
 with open('{:s}/gen_params.json'.format(json_path)) as json_file:
     json_params = json.load(json_file)
 
 setup_autopilot = json_params["setup"]["autopilot"]
 setup_gazebo = json_params["setup"]["gazebo"]
+setup_ros2 = json_params["setup"]["ros2"]
 
 models = json_params["models"]
 world_params = json_params["world_params"]
@@ -35,7 +39,7 @@ generate_world_params = world_params["generate_params"]
 
 for repo in setup_gazebo["gazebo_models"]:
     gazebo_repo = setup_gazebo["gazebo_models"][repo]
-    gazebo_repo_path = '{:s}/{:s}'.format(ros_ws, 
+    gazebo_repo_path = '{:s}/{:s}'.format(ros2_ws, 
         gazebo_repo["name"])
     if not os.path.isdir(gazebo_repo_path):
         clone_cmd = 'git clone -b {:s} {:s} {:s}'.format(
@@ -50,13 +54,17 @@ for repo in setup_gazebo["gazebo_models"]:
             if output:
                 print(output.strip())
         clone_popen.wait()
-    if '{:s}/models'.format(gazebo_repo_path) not in os.environ['GAZEBO_MODEL_PATH']:
+    if not gazebo_model_reset_env:
+        os.environ['GAZEBO_MODEL_PATH'] = '{:s}/models'.format(
+            gazebo_repo_path)
+        gazebo_model_reset_env=True
+    elif '{:s}/models'.format(gazebo_repo_path) not in os.getenv('GAZEBO_MODEL_PATH'):
         os.environ['GAZEBO_MODEL_PATH'] = '{:s}/models:{:s}'.format(
-            gazebo_repo_path, os.environ['GAZEBO_MODEL_PATH'])
+            gazebo_repo_path, os.getenv('GAZEBO_MODEL_PATH'))
 
 for build in setup_autopilot:
     autopilot_build = setup_autopilot[build]
-    autopilot_path = '{:s}/{:s}'.format(ros_ws, 
+    autopilot_path = '{:s}/{:s}'.format(ros2_ws, 
         autopilot_build["name"])
     autopilot_build_path = '{:s}/build/{:s}'.format(autopilot_path, 
         autopilot_build["build_type"])
@@ -89,20 +97,72 @@ for build in setup_autopilot:
                 print(output.strip())
         build_popen.wait()
 
-    if '{:s}/build_gazebo'.format(autopilot_build_path) not in os.environ['LD_LIBRARY_PATH']:
+    if os.getenv('LD_LIBRARY_PATH') is None:
+         os.environ['LD_LIBRARY_PATH'] = '{:s}/build_gazebo'.format(
+            autopilot_build_path)
+
+    elif '{:s}/build_gazebo'.format(autopilot_build_path) not in os.getenv('LD_LIBRARY_PATH'):
         os.environ['LD_LIBRARY_PATH'] = '{:s}/build_gazebo:{:s}'.format(
-            autopilot_build_path, os.environ['LD_LIBRARY_PATH'])
+            autopilot_build_path, os.getenv('LD_LIBRARY_PATH'))
 
-    if '{:s}/build_gazebo'.format(autopilot_build_path) not in os.environ['GAZEBO_PLUGIN_PATH']:
+    if not gazebo_plugin_reset_env and autopilot_build["gazebo_plugins"]:
+        os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo'.format(
+            autopilot_build_path)
+        gazebo_plugin_reset_env=True
+
+    elif autopilot_build["gazebo_plugins"] and ('{:s}/build_gazebo'.format(autopilot_build_path) 
+        not in os.getenv('GAZEBO_PLUGIN_PATH')):
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo:{:s}'.format(
-            autopilot_build_path, os.environ['GAZEBO_PLUGIN_PATH'])
+            autopilot_build_path, os.getenv('GAZEBO_PLUGIN_PATH'))
 
-if "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins" not in os.environ['GAZEBO_PLUGIN_PATH']:
+if os.getenv('GAZEBO_PLUGIN_PATH') is None:
+    os.environ['GAZEBO_PLUGIN_PATH'] = "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins"
+
+elif "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins" not in os.getenv('GAZEBO_PLUGIN_PATH'):
     os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}:{:s}'.format(
             "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins", 
-            os.environ['GAZEBO_PLUGIN_PATH'])
-if "/usr/share/gazebo-11" not in os.environ['GAZEBO_RESOURCE_PATH']:
-    os.environ['GAZEBO_RESOURCE_PATH'] = "/usr/share/gazebo-11"
+            os.getenv('GAZEBO_PLUGIN_PATH'))
+
+os.environ['GAZEBO_RESOURCE_PATH'] = "/usr/share/gazebo-11"
+
+
+############################################################################################################
+for build in setup_ros2:
+    ros2_pkg_build = setup_ros2[build]
+    ros2_pkg_path = '{:s}/src/{:s}'.format(ros2_ws,ros2_pkg_build["build_package"])
+    if (not os.path.isdir(ros2_pkg_path)):
+        built_ros2_pkgs=True
+        clone_cmd = 'git clone -b {:s} {:s} {:s}'.format(
+            ros2_pkg_build["version"],ros2_pkg_build["repo"], ros2_pkg_path)
+        clone_cmd_popen=shlex.split(clone_cmd)
+        clone_popen = subprocess.Popen(clone_cmd_popen, 
+            stdout=subprocess.PIPE, text=True)
+        while True:
+            output = clone_popen.stdout.readline()
+            if output == '' and clone_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+        clone_popen.wait()
+
+        build_cmd = 'colcon build {:s} {:s} {:s}'.format(
+            ros2_pkg_build["build_prefix"],ros2_pkg_build["build_package"],
+            ros2_pkg_build["build_postfix"])
+        build_cmd_popen=shlex.split(build_cmd)
+        build_popen = subprocess.Popen(build_cmd_popen, stdout=subprocess.PIPE, 
+            cwd=ros2_ws, text=True)
+        while True:
+            output = build_popen.stdout.readline()
+            if output == '' and build_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+        build_popen.wait()
+if built_ros2_pkgs:
+    os.system("gnome-terminal -t \"ROS2-MAGIC\" -- ros2 launch sim_gazebo_bringup sim_gazebo.launch.py")
+    sys.exit()
+
+##############################################################################################################
 
 if world_params["generate_world"]:
     generate_world_args=""
@@ -111,7 +171,7 @@ if world_params["generate_world"]:
             str(generate_world_params[params]))
 
     generate_world_cmd = 'python3 {:s}/{:s}/scripts/jinja_world_gen.py{:s}'.format(
-        ros_ws, world_params["gazebo_name"], generate_world_args
+        ros2_ws, world_params["gazebo_name"], generate_world_args
         ).replace("\n","").replace("    ","")
 
     world_cmd_popen=shlex.split(generate_world_cmd)
@@ -127,7 +187,7 @@ if world_params["generate_world"]:
     world_file_path='/tmp/{:s}.world'.format(generate_world_params["world_name"])
 
 else:
-    world_file_path='{:s}/{:s}/worlds/{:s}.world'.format(ros_ws,
+    world_file_path='{:s}/{:s}/worlds/{:s}.world'.format(ros2_ws,
         world_params["gazebo_name"],generate_world_params["world_name"])
 
 latitude = generate_world_params["latitude"]
@@ -175,7 +235,7 @@ def generate_launch_description():
                 params, str(generate_model_params[params]))
 
         generate_model = ['python3 {:s}/{:s}/scripts/jinja_model_gen.py{:s}'.format(
-            ros_ws, models[model_params]["gazebo_name"], 
+            ros2_ws, models[model_params]["gazebo_name"], 
             generate_model_args).replace("\n","").replace("    ","")]
 
         # Command to make storage folder
@@ -196,7 +256,7 @@ def generate_launch_description():
                         ).replace("\n","").replace("    ","")
 
         # Set path for PX4 build
-        px4_path = '{:s}/{:s}/build/{:s}'.format(ros_ws,
+        px4_path = '{:s}/{:s}/build/{:s}'.format(ros2_ws,
             models[model_params]["autopilot_name"],
             models[model_params]["autopilot_build_type"])
 
