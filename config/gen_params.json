@@ -5,6 +5,7 @@
 				"name": "TII-Autopilot",
 				"version": "tii_v1",
 				"clone": 1,
+				"gazebo_plugins": 1,
 				"build_type": "px4_sitl_default",
 				"build_prefix": "DONT_RUN=1",
 				"build_postfix": "gazebo"
@@ -14,6 +15,7 @@
 				"name": "NXP-Autopilot",
 				"version": "pr-cupcar",
 				"clone": 1,
+				"gazebo_plugins": 0,
 				"build_type": "px4_sitl_rtps",
 				"build_prefix": "DONT_RUN=1",
 				"build_postfix": "gazebo"
