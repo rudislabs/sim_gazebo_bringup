@@ -16,31 +16,39 @@ import shlex
 import sys
 import subprocess
 
-
+# Set relative paths to real paths
 launch_path = os.path.realpath(__file__).replace("sim_gazebo.launch.py","")
 json_path = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../config")))
 ros2_ws = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../../..")))
+
+# Initialize flags
 gazebo_model_reset_env=False
 gazebo_plugin_reset_env=False
 built_ros2_pkgs=False
 
-
+# Open JSON configuration file
 with open('{:s}/gen_params.json'.format(json_path)) as json_file:
     json_params = json.load(json_file)
 
+# Setup related configs
 setup_autopilot = json_params["setup"]["autopilot"]
 setup_gazebo = json_params["setup"]["gazebo"]
 setup_ros2 = json_params["setup"]["ros2"]
 
-models = json_params["models"]
+# Runtime related params
+ros2_nodes= json_params["nodes"]
 world_params = json_params["world_params"]
-generate_world_params = world_params["generate_params"]
+models = json_params["models"]
 
+########################################################################################
 
+# Iterate through defined Gazebo model repos
 for repo in setup_gazebo["gazebo_models"]:
     gazebo_repo = setup_gazebo["gazebo_models"][repo]
     gazebo_repo_path = '{:s}/{:s}'.format(ros2_ws, 
         gazebo_repo["name"])
+
+    # Clone Gazebo model repo if not present
     if not os.path.isdir(gazebo_repo_path):
         clone_cmd = 'git clone -b {:s} {:s} {:s}'.format(
             gazebo_repo["version"],gazebo_repo["repo"], gazebo_repo_path)
@@ -54,20 +62,29 @@ for repo in setup_gazebo["gazebo_models"]:
             if output:
                 print(output.strip())
         clone_popen.wait()
+
+    # Check to see if Gazebo model path environment variable is reset yet, if not reset to avoid other models
     if not gazebo_model_reset_env:
         os.environ['GAZEBO_MODEL_PATH'] = '{:s}/models'.format(
             gazebo_repo_path)
         gazebo_model_reset_env=True
+    
+    # Append to Gazebo model path environment for subsequent repos if not present
     elif '{:s}/models'.format(gazebo_repo_path) not in os.getenv('GAZEBO_MODEL_PATH'):
         os.environ['GAZEBO_MODEL_PATH'] = '{:s}/models:{:s}'.format(
             gazebo_repo_path, os.getenv('GAZEBO_MODEL_PATH'))
 
+########################################################################################
+
+# Iterate through defined autopilot repos
 for build in setup_autopilot:
     autopilot_build = setup_autopilot[build]
     autopilot_path = '{:s}/{:s}'.format(ros2_ws, 
         autopilot_build["name"])
     autopilot_build_path = '{:s}/build/{:s}'.format(autopilot_path, 
         autopilot_build["build_type"])
+
+    # Clone autopilot repo if not present
     if (not os.path.isdir(autopilot_path)) and (autopilot_build["clone"]):
         clone_cmd = 'git clone -b {:s} {:s} {:s}'.format(
             autopilot_build["version"],autopilot_build["repo"], autopilot_path)
@@ -82,6 +99,7 @@ for build in setup_autopilot:
                 print(output.strip())
         clone_popen.wait()
 
+    # Build autopilot if not built or incorrect version built
     if (os.path.isdir(autopilot_path)) and (not os.path.isdir(autopilot_build_path)):
         build_cmd = 'make clean && DONT_RUN=1 make {:s} {:s} {:s}'.format(
             autopilot_build["build_prefix"],autopilot_build["build_type"],
@@ -97,36 +115,46 @@ for build in setup_autopilot:
                 print(output.strip())
         build_popen.wait()
 
+    # Add to library path if no library path
     if os.getenv('LD_LIBRARY_PATH') is None:
          os.environ['LD_LIBRARY_PATH'] = '{:s}/build_gazebo'.format(
             autopilot_build_path)
 
+    # Add to library path if not already in library path
     elif '{:s}/build_gazebo'.format(autopilot_build_path) not in os.getenv('LD_LIBRARY_PATH'):
         os.environ['LD_LIBRARY_PATH'] = '{:s}/build_gazebo:{:s}'.format(
             autopilot_build_path, os.getenv('LD_LIBRARY_PATH'))
 
+    # Check to see if Gazebo plugin path environment variable is reset yet, if not reset to avoid plugin issues
+    # Only include plugin if set to be used in JSON setup.autopilot.autopilot_build_params__.gazebo_plugins
+    # Plugins will be built outside of the autopilot repo in future
     if not gazebo_plugin_reset_env and autopilot_build["gazebo_plugins"]:
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo'.format(
             autopilot_build_path)
         gazebo_plugin_reset_env=True
-
+    
+    # Append to Gazebo plugin path environment for subsequent builds if not present and set to be used
     elif autopilot_build["gazebo_plugins"] and ('{:s}/build_gazebo'.format(autopilot_build_path) 
         not in os.getenv('GAZEBO_PLUGIN_PATH')):
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo:{:s}'.format(
             autopilot_build_path, os.getenv('GAZEBO_PLUGIN_PATH'))
 
+# Always default plugins if no other plugins are set
 if os.getenv('GAZEBO_PLUGIN_PATH') is None:
     os.environ['GAZEBO_PLUGIN_PATH'] = "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins"
 
+# Add default plugins if not present
 elif "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins" not in os.getenv('GAZEBO_PLUGIN_PATH'):
     os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}:{:s}'.format(
             "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins", 
             os.getenv('GAZEBO_PLUGIN_PATH'))
 
+# set Gazebo resource path
 os.environ['GAZEBO_RESOURCE_PATH'] = "/usr/share/gazebo-11"
 
 
-############################################################################################################
+########################################################################################
+
 for build in setup_ros2:
     ros2_pkg_build = setup_ros2[build]
     ros2_pkg_path = '{:s}/src/{:s}'.format(ros2_ws,ros2_pkg_build["build_package"])
@@ -162,8 +190,9 @@ if built_ros2_pkgs:
     os.system("gnome-terminal -t \"ROS2-MAGIC\" -- ros2 launch sim_gazebo_bringup sim_gazebo.launch.py")
     sys.exit()
 
-##############################################################################################################
+########################################################################################
 
+generate_world_params = world_params["generate_params"]
 if world_params["generate_world"]:
     generate_world_args=""
     for params in generate_world_params:
@@ -194,6 +223,7 @@ latitude = generate_world_params["latitude"]
 longitude = generate_world_params["longitude"]
 altitude = generate_world_params["altitude"]
 
+########################################################################################
 
 def generate_launch_description():
 
@@ -216,24 +246,73 @@ def generate_launch_description():
     
     ld.add_action(gazebo_server)
 
-    instance = 0
+    ####################################################################################
+    # pre-spawn ROS2 Nodes
+    for node in ros2_nodes:
+        ros2_node = ros2_nodes[node]
+
+        # Run if timing set to pre-spawn of model
+        if ros2_node["timing"] == "pre-spawn":
+            prespawn_node = Node(package=ros2_node["package"],
+                executable=ros2_node["executable"],
+                name=ros2_node["name"], 
+                output=ros2_node["output"],
+                parameters=ros2_node["parameters"])
+
+            ld.add_action(prespawn_node)
+
+    ####################################################################################
+
+    # Initialize PX4 binary instance
     for model_params in models:
 
         generate_model_params = models[model_params]["generate_params"]
-
+        instance = int(models[model_params]["instance"])
+        # Assign unique model name if not explicitly set in JSON
         if generate_model_params["model_name"] == "NotSet":
             generate_model_params["model_name"] = 'sitl_{:s}_{:d}'.format(
                 generate_model_params["base_model"],instance)
 
+                # See if rtps_args exist for model
+        if "rtps_agent_args" in models[model_params]:
+
+            # Command to run micrortps agent based on instance if present but "NotSet"
+            if models[model_params]["rtps_agent_args"] == "NotSet":
+                urtps_agent_cmd = '''eval \"micrortps_agent -t UDP -r {:s} -s {:s}\"; 
+                    bash'''.format(str(2019+(2*instance)), str(2020+(2*instance))
+                        ).replace("\n","").replace("    ","")
+
+            # Command to run micrortps agent with assigned args since
+            # instance micrortps_client is broken
+            else:
+                urtps_agent_cmd = '''eval \"micrortps_agent {:s}\"; 
+                    bash'''.format(models[model_params]["rtps_agent_args"]
+                        ).replace("\n","").replace("    ","")
+
+            # Xterm command to name xterm window and run urtps_agent_cmd
+            xterm_urtps_agent_cmd = ['''xterm -hold -T \"{:s}\" 
+                -n \"{:s}\" -e \'{:s}\''''.format("micrortps_agent", 
+                    "micrortps_agent", urtps_agent_cmd
+                    ).replace("\n","").replace("    ","")]
+            
+            # Run agent command
+            micrortps_agent = ExecuteProcess(
+                cmd=xterm_urtps_agent_cmd,
+                name='xterm_urtps_agent_{:s}'.format(generate_model_params["model_name"]),
+                shell=True)
+    
+            ld.add_action(micrortps_agent)
+
         # Path for PX4 binary storage
         sitl_output_path = '/tmp/{:s}'.format(generate_model_params["model_name"])
 
-        
+        # Reset model generation args and pull new ones from JSON
         generate_model_args = ""
         for params in generate_model_params:
             generate_model_args += ' --{:s} "{:s}"'.format(
                 params, str(generate_model_params[params]))
 
+        # Model generation command using scripts/jinja_model_gen.py
         generate_model = ['python3 {:s}/{:s}/scripts/jinja_model_gen.py{:s}'.format(
             ros2_ws, models[model_params]["gazebo_name"], 
             generate_model_args).replace("\n","").replace("    ","")]
@@ -250,10 +329,10 @@ def generate_launch_description():
         
         # Set each xterm with PX4 environment variables
         px4_env = '''export PX4_SIM_MODEL=\"{:s}\"; export PX4_HOME_LAT={:s}; 
-                        export PX4_HOME_LON={:s}; export PX4_HOME_ALT={:s};'''.format(
-                        generate_model_params["base_model"], str(latitude_vehicle), 
-                        str(longitude_vehicle), str(altitude_vehicle)
-                        ).replace("\n","").replace("    ","")
+            export PX4_HOME_LON={:s}; export PX4_HOME_ALT={:s};'''.format(
+                generate_model_params["base_model"], str(latitude_vehicle), 
+                str(longitude_vehicle), str(altitude_vehicle)
+                ).replace("\n","").replace("    ","")
 
         # Set path for PX4 build
         px4_path = '{:s}/{:s}/build/{:s}'.format(ros2_ws,
@@ -295,8 +374,8 @@ def generate_launch_description():
             shell=True)
     
         ld.add_action(px4_posix)
-
-        # Spawn entity
+            
+        # Spawn model in gazebo
         spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                         arguments=['-entity', '{:s}'.format(generate_model_params["model_name"]),
                             '-x', str(spawn_pose[0]), '-y', str(spawn_pose[1]), '-z', str(spawn_pose[2]),
@@ -305,9 +384,24 @@ def generate_launch_description():
                         name='spawn_{:s}'.format(generate_model_params["model_name"]), output='screen')
 
         ld.add_action(spawn_entity)
-        
-        # Increment instance
-        instance += 1
+
+    ####################################################################################
+
+    # post-spawn ROS2 Nodes
+    for node in ros2_nodes:
+        ros2_node = ros2_nodes[node]
+
+        # Run if timing set to post-spawn of model
+        if ros2_node["timing"] == "post-spawn":
+            postspawn_node = Node(package=ros2_node["package"],
+                executable=ros2_node["executable"],
+                name=ros2_node["name"], 
+                output=ros2_node["output"],
+                parameters=ros2_node["parameters"])
+
+            ld.add_action(postspawn_node)
+
+########################################################################################
 
     # Launch gazebo client
     gazebo_client = IncludeLaunchDescription(
