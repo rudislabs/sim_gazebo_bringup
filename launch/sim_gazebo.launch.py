@@ -25,6 +25,21 @@ ros2_ws = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../../.."))
 gazebo_model_reset_env=False
 gazebo_plugin_reset_env=False
 built_ros2_pkgs=False
+clean_start=True
+
+# Clear /tmp output from previous runs
+if clean_start:
+    clean_cmd = "rm -rf /tmp/sitl* && rm -rf /tmp/px4* && rm -rf *.world"
+    clean_cmd_popen=shlex.split(clean_cmd)
+    clean_popen = subprocess.Popen(clean_cmd_popen, 
+        stdout=subprocess.PIPE, text=True)
+    while True:
+        output = clean_popen.stdout.readline()
+        if output == '' and clean_popen.poll() is not None:
+            break
+        if output:
+            print(output.strip())
+    clean_popen.wait()
 
 # Open JSON configuration file
 with open('{:s}/gen_params.json'.format(json_path)) as json_file:

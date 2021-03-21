@@ -3,7 +3,7 @@
 			"autopilot_build_params_0": {
 				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
 				"name": "TII-Autopilot",
-				"version": "tii_v1",
+				"version": "tii_v2",
 				"clone": 1,
 				"gazebo_plugins": 1,
 				"build_type": "px4_sitl_default",
@@ -13,7 +13,7 @@
 			"autopilot_build_params_1": {
 				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
 				"name": "NXP-Autopilot",
-				"version": "pr-cupcar",
+				"version": "pr-cupcar-v2",
 				"clone": 1,
 				"gazebo_plugins": 0,
 				"build_type": "px4_sitl_rtps",
@@ -30,7 +30,7 @@
 				},
 				"gazebo_repo_1":{
 					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
-					"version": "ros2",
+					"version": "fire_turtle",
 					"name": "nxp_gazebo"
 				}
 			}
@@ -103,13 +103,14 @@
 	},
 	"models": {
 		"model_params_0": {
-			"gazebo_name": "tii_gazebo",
-			"autopilot_name": "TII-Autopilot",
-			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 4, 1, 0, 0, 0],
+			"gazebo_name": "nxp_gazebo",
+			"autopilot_name": "NXP-Autopilot",
+			"rtps_arg": "-t UDP -r 2019 -s 2020",
+			"autopilot_build_type": "px4_sitl_rtps",
+			"spawn_pose": [0, 0, 0.2, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
-				"base_model": "iris",
+				"base_model": "nxp_cupcar",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4560,
 				"mavlink_udp_port": 14560,
@@ -119,7 +120,7 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
-				"hil_mode": 1,
+				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
 		},
@@ -136,28 +137,6 @@
 				"mavlink_udp_port": 14561,
 				"qgc_udp_port": 14551,
 				"sdk_udp_port": 14541,
-				"serial_enabled": 0,
-				"serial_device": "/dev/ttyACM0",
-				"serial_baudrate": 921600,
-				"enable_lockstep": 1,
-				"hil_mode": 0,
-				"model_name": "NotSet"
-			}
-		},
-		"model_params_2": {
-			"gazebo_name": "nxp_gazebo",
-			"autopilot_name": "NXP-Autopilot",
-			"rtps_arg": "-t UDP -r 2019 -s 2020",
-			"autopilot_build_type": "px4_sitl_rtps",
-			"spawn_pose": [0, 0, 0.2, 0, 0, 0],
-			"instance": 2,
-			"generate_params":{
-				"base_model": "nxp_cupcar",
-				"sdf_version": "NotSet",
-				"mavlink_tcp_port": 4562,
-				"mavlink_udp_port": 14562,
-				"qgc_udp_port": 14552,
-				"sdk_udp_port": 14542,
 				"serial_enabled": 0,
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,

@@ -52,7 +52,7 @@
 			"gazebo_name": "tii_gazebo",
 			"autopilot_name": "TII-Autopilot",
 			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 4, 1, 0, 0, 0],
+			"spawn_pose": [0, 0, 1, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
 				"base_model": "iris",
@@ -65,7 +65,7 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
-				"hil_mode": 1,
+				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
 		},
