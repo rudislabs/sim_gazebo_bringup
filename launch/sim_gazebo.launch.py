@@ -173,7 +173,7 @@ for build in setup_gazebo["gazebo_plugins"]:
 
     # Clone autopilot repo if not present
     if (not os.path.isdir(plugin_path)):
-        clone_cmd = 'git clone -b {:s} {:s} {:s}'.format(
+        clone_cmd = 'git clone --recursive -b {:s} {:s} {:s}'.format(
             plugin_build["version"],plugin_build["repo"], plugin_path)
         clone_cmd_popen=shlex.split(clone_cmd)
         clone_popen = subprocess.Popen(clone_cmd_popen, 
@@ -188,30 +188,36 @@ for build in setup_gazebo["gazebo_plugins"]:
 
     # Build plugin if not built
     if (os.path.isdir(plugin_path)) and (not os.path.isdir(plugin_build_path)):
-        folder_cmd = "rm -rf build && mkdir -p build"
-        folder_cmd_popen=shlex.split(folder_cmd)
-        folder_popen = subprocess.Popen(folder_cmd_popen, stdout=subprocess.PIPE, 
-            cwd=plugin_path, text=True)
-        while True:
-            output = folder_popen.stdout.readline()
-            if output == '' and folder_popen.poll() is not None:
-                break
-            if output:
-                print(output.strip())
-        folder_popen.wait()
+        try: 
+            os.makedirs(plugin_build_path, exist_ok = True) 
+        except OSError as error: 
+            print("Directory creation error.")
 
-        build_cmd = 'cmake .. -D_MAVLINK_INCLUDE_DIR={:s} && make -j$(nproc) -l$(nproc)'.format(
+        cmake_cmd = 'cmake .. -D_MAVLINK_INCLUDE_DIR={:s}'.format(
             plugin_mavlink_path)
-        build_cmd_popen=shlex.split(build_cmd)
-        build_popen = subprocess.Popen(build_cmd_popen, stdout=subprocess.PIPE, 
+        cmake_cmd_popen=shlex.split(cmake_cmd)
+        cmake_popen = subprocess.Popen(cmake_cmd_popen, stdout=subprocess.PIPE, 
             cwd=plugin_build_path, text=True)
         while True:
-            output = build_popen.stdout.readline()
-            if output == '' and build_popen.poll() is not None:
+            output = cmake_popen.stdout.readline()
+            if output == '' and cmake_popen.poll() is not None:
                 break
             if output:
                 print(output.strip())
-        build_popen.wait()
+        cmake_popen.wait()
+
+        make_cmd = 'make -j{:s} -l{:s}'.format(
+            str(os.cpu_count()), str(os.cpu_count()))
+        make_cmd_popen=shlex.split(make_cmd)
+        make_popen = subprocess.Popen(make_cmd_popen, stdout=subprocess.PIPE, 
+            cwd=plugin_build_path, text=True)
+        while True:
+            output = make_popen.stdout.readline()
+            if output == '' and make_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+        make_popen.wait()
 
     # Add to library path if no library path
     if os.getenv('LD_LIBRARY_PATH') is None:
@@ -288,11 +294,15 @@ if built_ros2_pkgs:
     os.system('/bin/bash {:s}'.format(src_ros2_ws))
     os.system("/bin/bash /opt/ros/foxy/setup.bash")
     sleep(2)
-    os.system('''gnome-terminal -t \"ROS2-MAGIC\" -- bash -c \'echo 
-        \"Sourcing sim_gazebo workspace\"; /bin/bash {:s}; 
-        echo \"Sourcing ROS2 Foxy\"; /bin/bash /opt/ros/foxy/setup.bash; 
-        echo \"Relaunching ROS2\"; ros2 launch sim_gazebo_bringup sim_gazebo.launch.py; 
-        bash\''''.format(src_ros2_ws).replace("\n","").replace("    ",""))
+    #Only works on some system setups with correct .bashrc
+    #os.system('''gnome-terminal -t \"MAGIC\" -- bash -c \'echo 
+    #    \"Sourcing sim_gazebo workspace\"; /bin/bash {:s}; 
+    #    echo \"Sourcing ROS2 Foxy\"; /bin/bash /opt/ros/foxy/setup.bash; 
+    #    echo \"Relaunching ROS2\"; ros2 launch sim_gazebo_bringup sim_gazebo.launch.py; 
+    #    bash\''''.format(src_ros2_ws).replace("\n","").replace("    ",""))
+    print('''\n\n\nPLEASE RUN:\n 
+        source {:s}; source /opt/ros/foxy/setup.bash; ros2 launch sim_gazebo_bringup sim_gazebo.launch.py
+        \n\n'''.format(src_ros2_ws))
     sys.exit()
 
 ########################################################################################
