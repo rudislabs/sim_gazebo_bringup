@@ -61,7 +61,7 @@
 	},
 	"nodes": {
 		"ros2_node_0":{
-			"timing": "pre-spawn",
+			"timing": "post-spawn",
 			"package": "nxp_cup_vision",
 			"executable": "nxp_track_vision",
 			"name": "nxp_track_vision",
@@ -128,10 +128,10 @@
 			"gazebo_name": "tii_gazebo",
 			"autopilot_name": "TII-Autopilot",
 			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 2, 1, 0, 0, 0],
+			"spawn_pose": [0, 2, 0.3, 0, 0, 0],
 			"instance": 1,
 			"generate_params":{
-				"base_model": "standard_vtol",
+				"base_model": "iris",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4561,
 				"mavlink_udp_port": 14561,

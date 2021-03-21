@@ -3,10 +3,20 @@
 			"autopilot_build_params_0": {
 				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
 				"name": "TII-Autopilot",
-				"version": "tii_v1",
+				"version": "tii_v2",
 				"clone": 1,
 				"gazebo_plugins": 1,
 				"build_type": "px4_sitl_default",
+				"build_prefix": "DONT_RUN=1",
+				"build_postfix": "gazebo"
+			},
+			"autopilot_build_params_1": {
+				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
+				"name": "NXP-Autopilot",
+				"version": "pr-cupcar-v2",
+				"clone": 1,
+				"gazebo_plugins": 0,
+				"build_type": "px4_sitl_rtps",
 				"build_prefix": "DONT_RUN=1",
 				"build_postfix": "gazebo"
 			}
@@ -17,15 +27,59 @@
 					"repo": "git@github.com:rudislabs/tii_gazebo.git",
 					"version": "main",
 					"name": "tii_gazebo"
+				},
+				"gazebo_repo_1":{
+					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
+					"version": "fire_turtle",
+					"name": "nxp_gazebo"
 				}
 			}
 		},
-		"ros2": {}
+		"ros2": {
+			"ros2_repo_0":{
+				"repo": "git@github.com:rudislabs/px4_msgs.git",
+				"version": "pr-cupcar",
+				"build_package": "px4_msgs",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_1":{
+				"repo": "git@github.com:rudislabs/px4_ros_com.git",
+				"version": "pr-cupcar",
+				"build_package": "px4_ros_com",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_2":{
+				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
+				"version": "main",
+				"build_package": "nxp_cup_vision",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			}
+		}
 	},
-	"nodes": {},
+	"nodes": {
+		"ros2_node_0":{
+			"timing": "post-spawn",
+			"package": "nxp_cup_vision",
+			"executable": "nxp_track_vision",
+			"name": "nxp_track_vision",
+			"output": "screen",
+			"parameters": [{"pyramid_down": 2},{"debug": "True"}]
+		},
+		"ros2_node_1":{
+			"timing": "post-spawn",
+			"package": "rqt_image_view",
+			"executable": "rqt_image_view",
+			"name": "rqt_image_view",
+			"output": "screen",
+			"parameters": []
+		}
+	},
 	"world_params": {
-		"gazebo_name": "tii_gazebo",
-		"generate_world": 1,
+		"gazebo_name": "nxp_gazebo",
+		"generate_world": 0,
 		"generate_params":{
 			"sdf_version": "NotSet",
 			"sun_model": "sunSolarNoon",
@@ -36,7 +90,7 @@
 			"update_rate": 250,
 			"wind_speed": "NotSet",
 			"realtime_factor": 1.0,
-			"world_name": "empty",
+			"world_name": "nxp_raceway_overpass",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
 			"spherical_coords": 1,
@@ -49,13 +103,14 @@
 	},
 	"models": {
 		"model_params_0": {
-			"gazebo_name": "tii_gazebo",
-			"autopilot_name": "TII-Autopilot",
-			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 0, 1, 0, 0, 0],
+			"gazebo_name": "nxp_gazebo",
+			"autopilot_name": "NXP-Autopilot",
+			"rtps_arg": "-t UDP -r 2019 -s 2020",
+			"autopilot_build_type": "px4_sitl_rtps",
+			"spawn_pose": [0, 0, 0.2, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
-				"base_model": "iris",
+				"base_model": "nxp_cupcar",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4560,
 				"mavlink_udp_port": 14560,
@@ -73,10 +128,10 @@
 			"gazebo_name": "tii_gazebo",
 			"autopilot_name": "TII-Autopilot",
 			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 2, 1, 0, 0, 0],
+			"spawn_pose": [0, 2, 0.3, 0, 0, 0],
 			"instance": 1,
 			"generate_params":{
-				"base_model": "standard_vtol",
+				"base_model": "iris",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4561,
 				"mavlink_udp_port": 14561,
