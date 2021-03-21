@@ -5,33 +5,49 @@
 				"name": "TII-Autopilot",
 				"version": "tii_v2",
 				"clone": 1,
-				"gazebo_plugins": 1,
+				"source_gazebo_plugins": 0,
 				"build_type": "px4_sitl_default",
 				"build_prefix": "DONT_RUN=1",
-				"build_postfix": "gazebo"
+				"build_postfix": ""
 			},
 			"autopilot_build_params_1": {
 				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
 				"name": "NXP-Autopilot",
 				"version": "pr-cupcar-v2",
 				"clone": 1,
-				"gazebo_plugins": 0,
+				"source_gazebo_plugins": 0,
 				"build_type": "px4_sitl_rtps",
 				"build_prefix": "DONT_RUN=1",
-				"build_postfix": "gazebo"
+				"build_postfix": ""
 			}
 		},
 		"gazebo": {
 			"gazebo_models": {
-				"gazebo_repo_0":{
+				"gazebo_model_repo_0":{
 					"repo": "git@github.com:rudislabs/tii_gazebo.git",
 					"version": "main",
 					"name": "tii_gazebo"
 				},
-				"gazebo_repo_1":{
+				"gazebo_model_repo_1":{
 					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
 					"version": "fire_turtle",
 					"name": "nxp_gazebo"
+				}
+			},
+			"gazebo_plugins": {
+				"gazebo_plugin_repo_0":{
+					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
+					"version": "master",
+					"name": "tii_gazebo_plugins",
+					"workspace_relative_mavlink": "TII-Autopilot/mavlink/include/",
+					"source_gazebo_plugins": 1
+				},
+				"gazebo_plugin_repo_1":{
+					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
+					"version": "master",
+					"name": "nxp_gazebo_plugins",
+					"workspace_relative_mavlink": "NXP-Autopilot/mavlink/include/",
+					"source_gazebo_plugins": 0
 				}
 			}
 		},

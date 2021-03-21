@@ -147,16 +147,95 @@ for build in setup_autopilot:
     # Check to see if Gazebo plugin path environment variable is reset yet, if not reset to avoid plugin issues
     # Only include plugin if set to be used in JSON setup.autopilot.autopilot_build_params__.gazebo_plugins
     # Plugins will be built outside of the autopilot repo in future
-    if not gazebo_plugin_reset_env and autopilot_build["gazebo_plugins"]:
+    if not gazebo_plugin_reset_env and autopilot_build["source_gazebo_plugins"]:
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo'.format(
             autopilot_build_path)
         gazebo_plugin_reset_env=True
     
     # Append to Gazebo plugin path environment for subsequent builds if not present and set to be used
-    elif autopilot_build["gazebo_plugins"] and ('{:s}/build_gazebo'.format(autopilot_build_path) 
+    elif autopilot_build["source_gazebo_plugins"] and ('{:s}/build_gazebo'.format(autopilot_build_path) 
         not in os.getenv('GAZEBO_PLUGIN_PATH')):
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo:{:s}'.format(
             autopilot_build_path, os.getenv('GAZEBO_PLUGIN_PATH'))
+
+########################################################################################
+
+# Iterate through defined autopilot repos
+for build in setup_gazebo["gazebo_plugins"]:
+    plugin_build = setup_gazebo["gazebo_plugins"][build]
+    plugin_path = '{:s}/{:s}'.format(ros2_ws, 
+        plugin_build["name"])
+    plugin_mavlink_path = '{:s}/{:s}'.format(ros2_ws, 
+        plugin_build["workspace_relative_mavlink"])
+    plugin_mavlink_path = '{:s}/{:s}'.format(ros2_ws, 
+        plugin_build["workspace_relative_mavlink"])
+    plugin_build_path = '{:s}/build'.format(plugin_path)
+
+    # Clone autopilot repo if not present
+    if (not os.path.isdir(plugin_path)):
+        clone_cmd = 'git clone -b {:s} {:s} {:s}'.format(
+            plugin_build["version"],plugin_build["repo"], plugin_path)
+        clone_cmd_popen=shlex.split(clone_cmd)
+        clone_popen = subprocess.Popen(clone_cmd_popen, 
+            stdout=subprocess.PIPE, text=True)
+        while True:
+            output = clone_popen.stdout.readline()
+            if output == '' and clone_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+        clone_popen.wait()
+
+    # Build plugin if not built
+    if (os.path.isdir(plugin_path)) and (not os.path.isdir(plugin_build_path)):
+        folder_cmd = "rm -rf build && mkdir -p build"
+        folder_cmd_popen=shlex.split(folder_cmd)
+        folder_popen = subprocess.Popen(folder_cmd_popen, stdout=subprocess.PIPE, 
+            cwd=plugin_path, text=True)
+        while True:
+            output = folder_popen.stdout.readline()
+            if output == '' and folder_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+        folder_popen.wait()
+
+        build_cmd = 'cmake .. -D_MAVLINK_INCLUDE_DIR={:s} && make -j$(nproc) -l$(nproc)'.format(
+            plugin_mavlink_path)
+        build_cmd_popen=shlex.split(build_cmd)
+        build_popen = subprocess.Popen(build_cmd_popen, stdout=subprocess.PIPE, 
+            cwd=plugin_build_path, text=True)
+        while True:
+            output = build_popen.stdout.readline()
+            if output == '' and build_popen.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+        build_popen.wait()
+
+    # Add to library path if no library path
+    if os.getenv('LD_LIBRARY_PATH') is None:
+         os.environ['LD_LIBRARY_PATH'] = '{:s}'.format(
+            plugin_build_path)
+
+    # Add to library path if not already in library path
+    elif '{:s}/build_gazebo'.format(plugin_build_path) not in os.getenv('LD_LIBRARY_PATH'):
+        os.environ['LD_LIBRARY_PATH'] = '{:s}:{:s}'.format(
+            plugin_build_path, os.getenv('LD_LIBRARY_PATH'))
+
+    # Check to see if Gazebo plugin path environment variable is reset yet, if not reset to avoid plugin issues
+    # Only include plugin if set to be used in JSON setup.autopilot.autopilot_build_params__.gazebo_plugins
+    # Plugins will be built outside of the autopilot repo in future
+    if not gazebo_plugin_reset_env and plugin_build["source_gazebo_plugins"]:
+        os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}'.format(
+            plugin_build_path)
+        gazebo_plugin_reset_env=True
+    
+    # Append to Gazebo plugin path environment for subsequent builds if not present and set to be used
+    elif plugin_build["source_gazebo_plugins"] and ('{:s}/build_gazebo'.format(plugin_build_path) 
+        not in os.getenv('GAZEBO_PLUGIN_PATH')):
+        os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}:{:s}'.format(
+            plugin_build_path, os.getenv('GAZEBO_PLUGIN_PATH'))
 
 # Always default plugins if no other plugins are set
 if os.getenv('GAZEBO_PLUGIN_PATH') is None:
@@ -170,7 +249,6 @@ elif "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins" not in os.getenv('GAZEBO_PLUG
 
 # set Gazebo resource path
 os.environ['GAZEBO_RESOURCE_PATH'] = "/usr/share/gazebo-11"
-
 
 ########################################################################################
 
