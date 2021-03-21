@@ -29,6 +29,10 @@ clean_start=True
 
 # Clear /tmp output from previous runs
 if clean_start:
+    os.system("pkill -9 xterm")
+    os.system("pkill -9 gzclient")
+    os.system("pkill -9 gzserver")
+    os.system("pkill -9 px4*")
     clean_cmd = "rm -rf /tmp/sitl* && rm -rf /tmp/px4* && rm -rf *.world"
     clean_cmd_popen=shlex.split(clean_cmd)
     clean_popen = subprocess.Popen(clean_cmd_popen, 
@@ -202,7 +206,15 @@ for build in setup_ros2:
                 print(output.strip())
         build_popen.wait()
 if built_ros2_pkgs:
-    os.system("gnome-terminal -t \"ROS2-MAGIC\" -- ros2 launch sim_gazebo_bringup sim_gazebo.launch.py")
+    src_ros2_ws = '{:s}/install/setup.bash'.format(ros2_ws)
+    os.system('/bin/bash {:s}'.format(src_ros2_ws))
+    os.system("/bin/bash /opt/ros/foxy/setup.bash")
+    sleep(2)
+    os.system('''gnome-terminal -t \"ROS2-MAGIC\" -- bash -c \'echo 
+        \"Sourcing sim_gazebo workspace\"; /bin/bash {:s}; 
+        echo \"Sourcing ROS2 Foxy\"; /bin/bash /opt/ros/foxy/setup.bash; 
+        echo \"Relaunching ROS2\"; ros2 launch sim_gazebo_bringup sim_gazebo.launch.py; 
+        bash\''''.format(src_ros2_ws).replace("\n","").replace("    ",""))
     sys.exit()
 
 ########################################################################################
