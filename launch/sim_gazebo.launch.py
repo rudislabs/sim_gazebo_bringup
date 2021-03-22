@@ -20,10 +20,13 @@ import subprocess
 launch_path = os.path.realpath(__file__).replace("sim_gazebo.launch.py","")
 json_path = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../config")))
 ros2_ws = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../../..")))
+gazebo_verbose='true'
 
 # Initialize flags
 gazebo_model_reset_env=False
 gazebo_plugin_reset_env=False
+ld_library_reset_env=True
+sitl_gazebo_path_reset_env=False
 built_ros2_pkgs=False
 clean_start=True
 
@@ -33,7 +36,7 @@ if clean_start:
     os.system("pkill -9 gzclient")
     os.system("pkill -9 gzserver")
     os.system("pkill -9 px4*")
-    clean_cmd = "rm -rf /tmp/sitl* && rm -rf /tmp/px4* && rm -rf *.world"
+    clean_cmd = "rm -rf /tmp/sitl* && rm -rf /tmp/models && rm -rf /tmp/px4* && rm -rf *.world"
     clean_cmd_popen=shlex.split(clean_cmd)
     clean_popen = subprocess.Popen(clean_cmd_popen, 
         stdout=subprocess.PIPE, text=True)
@@ -84,7 +87,7 @@ for repo in setup_gazebo["gazebo_models"]:
 
     # Check to see if Gazebo model path environment variable is reset yet, if not reset to avoid other models
     if not gazebo_model_reset_env:
-        os.environ['GAZEBO_MODEL_PATH'] = '{:s}/models'.format(
+        os.environ['GAZEBO_MODEL_PATH'] = '{:s}/models:/tmp/models'.format(
             gazebo_repo_path)
         gazebo_model_reset_env=True
     
@@ -134,33 +137,50 @@ for build in setup_autopilot:
                 print(output.strip())
         build_popen.wait()
 
+    # Add to sitl gazebo path if no sitl gazebo path
+    if not sitl_gazebo_path_reset_env or os.getenv('SITL_GAZEBO_PATH') is None \
+        and autopilot_build["build_postfix"] == 'gazebo':
+        os.environ['SITL_GAZEBO_PATH'] = '{:s}/Tools/sitl_gazebo'.format(autopilot_path)
+        sitl_gazebo_path_reset_env = True
+
+    # Add to sitl gazebo path if not already in sitl gazebo path
+    elif '{:s}/Tools/sitl_gazebo'.format(autopilot_path) not in os.getenv('SITL_GAZEBO_PATH') \
+        and autopilot_build["build_postfix"] == 'gazebo':
+        os.environ['SITL_GAZEBO_PATH'] = '{:s}:{:s}'.format(
+            '{:s}/Tools/sitl_gazebo'.format(autopilot_path), 
+            os.getenv('SITL_GAZEBO_PATH'))
+
     # Add to library path if no library path
-    if os.getenv('LD_LIBRARY_PATH') is None:
-         os.environ['LD_LIBRARY_PATH'] = '{:s}/build_gazebo'.format(
+    if (not ld_library_reset_env or os.getenv('LD_LIBRARY_PATH') is None) \
+        and autopilot_build["build_postfix"] == 'gazebo':
+        os.environ['LD_LIBRARY_PATH'] = '{:s}/build_gazebo'.format(
             autopilot_build_path)
+        ld_library_reset_env = True
 
     # Add to library path if not already in library path
-    elif '{:s}/build_gazebo'.format(autopilot_build_path) not in os.getenv('LD_LIBRARY_PATH'):
+    elif ('{:s}/build_gazebo'.format(autopilot_build_path) not in os.getenv('LD_LIBRARY_PATH')) \
+        and autopilot_build["build_postfix"] == 'gazebo':
         os.environ['LD_LIBRARY_PATH'] = '{:s}/build_gazebo:{:s}'.format(
             autopilot_build_path, os.getenv('LD_LIBRARY_PATH'))
 
     # Check to see if Gazebo plugin path environment variable is reset yet, if not reset to avoid plugin issues
     # Only include plugin if set to be used in JSON setup.autopilot.autopilot_build_params__.gazebo_plugins
     # Plugins will be built outside of the autopilot repo in future
-    if not gazebo_plugin_reset_env and autopilot_build["source_gazebo_plugins"]:
+    if (not gazebo_plugin_reset_env and autopilot_build["source_gazebo_plugins"]) \
+        and autopilot_build["build_postfix"] == 'gazebo':
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo'.format(
             autopilot_build_path)
         gazebo_plugin_reset_env=True
     
     # Append to Gazebo plugin path environment for subsequent builds if not present and set to be used
-    elif autopilot_build["source_gazebo_plugins"] and ('{:s}/build_gazebo'.format(autopilot_build_path) 
-        not in os.getenv('GAZEBO_PLUGIN_PATH')):
+    elif (autopilot_build["source_gazebo_plugins"] and ('{:s}/build_gazebo'.format(autopilot_build_path) 
+        not in os.getenv('GAZEBO_PLUGIN_PATH'))) and autopilot_build["build_postfix"] == 'gazebo':
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo:{:s}'.format(
             autopilot_build_path, os.getenv('GAZEBO_PLUGIN_PATH'))
 
 ########################################################################################
 
-# Iterate through defined autopilot repos
+# Iterate through defined gazebo_plugins repos
 for build in setup_gazebo["gazebo_plugins"]:
     plugin_build = setup_gazebo["gazebo_plugins"][build]
     plugin_path = '{:s}/{:s}'.format(ros2_ws, 
@@ -219,10 +239,21 @@ for build in setup_gazebo["gazebo_plugins"]:
                 print(output.strip())
         make_popen.wait()
 
+    # Add to sitl gazebo path if no sitl gazebo path
+    if not sitl_gazebo_path_reset_env or os.getenv('SITL_GAZEBO_PATH') is None:
+        os.environ['SITL_GAZEBO_PATH'] = plugin_path
+        sitl_gazebo_path_reset_env = True
+
+    # Add to sitl gazebo path if not already in sitl gazebo path
+    elif plugin_path not in os.getenv('SITL_GAZEBO_PATH'):
+        os.environ['SITL_GAZEBO_PATH'] = '{:s}:{:s}'.format(
+            plugin_path, os.getenv('SITL_GAZEBO_PATH'))
+    
     # Add to library path if no library path
-    if os.getenv('LD_LIBRARY_PATH') is None:
-         os.environ['LD_LIBRARY_PATH'] = '{:s}'.format(
-            plugin_build_path)
+    if not ld_library_reset_env or os.getenv('LD_LIBRARY_PATH') is None:
+        os.environ['LD_LIBRARY_PATH'] = '{:s}/build_gazebo'.format(
+            autopilot_build_path)
+        ld_library_reset_env = True
 
     # Add to library path if not already in library path
     elif '{:s}/build_gazebo'.format(plugin_build_path) not in os.getenv('LD_LIBRARY_PATH'):
@@ -248,13 +279,13 @@ if os.getenv('GAZEBO_PLUGIN_PATH') is None:
     os.environ['GAZEBO_PLUGIN_PATH'] = "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins"
 
 # Add default plugins if not present
-elif "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins" not in os.getenv('GAZEBO_PLUGIN_PATH'):
-    os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}:{:s}'.format(
-            "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins", 
-            os.getenv('GAZEBO_PLUGIN_PATH'))
+#elif "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins" not in os.getenv('GAZEBO_PLUGIN_PATH'):
+#    os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}:{:s}'.format(
+#            "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins", 
+#            os.getenv('GAZEBO_PLUGIN_PATH'))
 
 # set Gazebo resource path
-os.environ['GAZEBO_RESOURCE_PATH'] = "/usr/share/gazebo-11"
+#os.environ['GAZEBO_RESOURCE_PATH'] = "/usr/share/gazebo-11"
 
 ########################################################################################
 
@@ -347,7 +378,11 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'world_path', default_value= world_file_path,
             description='Provide full world file path and name'),
+        DeclareLaunchArgument(
+            'verbose', default_value= gazebo_verbose,
+            description='Run in verbose mode'),
         LogInfo(msg=LaunchConfiguration('world_path')),
+        LogInfo(msg=LaunchConfiguration('verbose')),
         ])
 
     # Get path to gazebo package
@@ -356,7 +391,10 @@ def generate_launch_description():
     # Launch gazebo servo with world file from world_path
     gazebo_server = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([gazebo_package_prefix,'/launch/gzserver.launch.py']),
-                launch_arguments={'world': LaunchConfiguration('world_path')}.items(),
+                launch_arguments={
+                    'world': LaunchConfiguration('world_path'),
+                    'verbose': LaunchConfiguration('verbose')
+                    }.items(),
                 )
     
     ld.add_action(gazebo_server)
@@ -520,7 +558,11 @@ def generate_launch_description():
 
     # Launch gazebo client
     gazebo_client = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([gazebo_package_prefix,'/launch/gzclient.launch.py']))
+        PythonLaunchDescriptionSource([gazebo_package_prefix,'/launch/gzclient.launch.py']),
+        launch_arguments={
+                    'verbose': LaunchConfiguration('verbose')
+                    }.items(),
+        )
     
     LogInfo(msg="\nWaiting to launch Gazebo Client...\n")
     sleep(2)

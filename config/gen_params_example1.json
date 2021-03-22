@@ -3,7 +3,7 @@
 			"autopilot_build_params_0": {
 				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
 				"name": "TII-Autopilot",
-				"version": "tii_v1",
+				"version": "tii_v2",
 				"clone": 1,
 				"source_gazebo_plugins": 0,
 				"build_type": "px4_sitl_default",
@@ -15,14 +15,14 @@
 			"gazebo_models": {
 				"gazebo_repo_0":{
 					"repo": "git@github.com:rudislabs/tii_gazebo.git",
-					"version": "main",
+					"version": "fire_turtle",
 					"name": "tii_gazebo"
 				}
 			},
 			"gazebo_plugins": {
 				"gazebo_plugin_repo_0":{
-					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
-					"version": "master",
+					"repo": "git@github.com:jgoppert/sitl_gazebo.git",
+					"version": "gps_attack",
 					"name": "tii_gazebo_plugins",
 					"workspace_relative_mavlink": "TII-Autopilot/mavlink/include/",
 					"source_gazebo_plugins": 1
@@ -34,7 +34,7 @@
 	"nodes": {},
 	"world_params": {
 		"gazebo_name": "tii_gazebo",
-		"generate_world": 1,
+		"generate_world": 0,
 		"generate_params":{
 			"sdf_version": "NotSet",
 			"sun_model": "sunSolarNoon",
@@ -45,7 +45,7 @@
 			"update_rate": 250,
 			"wind_speed": "NotSet",
 			"realtime_factor": 1.0,
-			"world_name": "empty",
+			"world_name": "abu_dhabi",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
 			"spherical_coords": 1,
@@ -74,27 +74,9 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
-				"hil_mode": 0,
-				"model_name": "NotSet"
-			}
-		},
-		"model_params_1": {
-			"gazebo_name": "tii_gazebo",
-			"autopilot_name": "TII-Autopilot",
-			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 2, 1, 0, 0, 0],
-			"instance": 1,
-			"generate_params":{
-				"base_model": "standard_vtol",
-				"sdf_version": "NotSet",
-				"mavlink_tcp_port": 4561,
-				"mavlink_udp_port": 14561,
-				"qgc_udp_port": 14551,
-				"sdk_udp_port": 14541,
-				"serial_enabled": 0,
-				"serial_device": "/dev/ttyACM0",
-				"serial_baudrate": 921600,
-				"enable_lockstep": 1,
+				"gps_attack_time": 20,
+				"gps_attack_rate": 0.2,
+				"gps_model_name": "NotSet",
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
