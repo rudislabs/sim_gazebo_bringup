@@ -227,7 +227,7 @@ for build in setup_gazebo["gazebo_plugins"]:
         cmake_popen.wait()
 
         make_cmd = 'make -j{:s} -l{:s}'.format(
-            str(np.floor(os.cpu_count()*.75)), str(np.floor(os.cpu_count()*.75)))
+            str(int(np.floor(os.cpu_count()*.75))), str(int(np.floor(os.cpu_count()*.75))))
         make_cmd_popen=shlex.split(make_cmd)
         make_popen = subprocess.Popen(make_cmd_popen, stdout=subprocess.PIPE, 
             cwd=plugin_build_path, text=True)
