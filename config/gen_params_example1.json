@@ -21,7 +21,7 @@
 			},
 			"gazebo_plugins": {
 				"gazebo_plugin_repo_0":{
-					"repo": "git@github.com:jgoppert/sitl_gazebo.git",
+					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
 					"version": "gps_attack",
 					"name": "tii_gazebo_plugins",
 					"workspace_relative_mavlink": "TII-Autopilot/mavlink/include/",
@@ -29,7 +29,48 @@
 				}
 			}
 		},
-		"ros2": {}
+		"ros2": {
+		},
+		"system": {
+			"connections": {
+				"connection_0":{
+					"force_unbind": true,
+					"transport": "udp",
+					"ports": [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+				},
+				"connection_1":{
+					"force_unbind": false,
+					"transport": "tcp",
+					"ports": []
+				}
+			},
+			"set_environment": {
+				"environment_0": {
+					"variable": "GAZEBO_MODEL_DATABASE_URI",
+					"value": "",
+					"method": "overwrite"
+				},
+				"environment_1": {
+					"variable": "GAZEBO_RESOURCE_PATH",
+					"value": "/usr/share/gazebo-11",
+					"method": "overwrite"
+				},
+				"environment_2": {
+					"variable": "GAZEBO_RESOURCE_PATH",
+					"value": "/usr/share/gazebo-11",
+					"method": "prepend"
+				},
+				"environment_3": {
+					"variable": "JAVA_HOME",
+					"value": "/usr/lib/jvm/java-8-openjdk-amd64/",
+					"method": "ignore"
+				}
+			}
+		}
+	},
+	"verbose": {
+		"gzclient": true,
+		"gzserver": true
 	},
 	"nodes": {},
 	"world_params": {
@@ -61,7 +102,7 @@
 			"gazebo_name": "tii_gazebo",
 			"autopilot_name": "TII-Autopilot",
 			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 0, 1, 0, 0, 0],
+			"spawn_pose": [0, 0, 0.5, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
 				"base_model": "iris",
@@ -70,6 +111,30 @@
 				"mavlink_udp_port": 14560,
 				"qgc_udp_port": 14550,
 				"sdk_udp_port": 14540,
+				"serial_enabled": 0,
+				"serial_device": "/dev/ttyACM0",
+				"serial_baudrate": 921600,
+				"enable_lockstep": 1,
+				"gps_attack_time": 20,
+				"gps_attack_rate": 0.2,
+				"gps_model_name": "NotSet",
+				"hil_mode": 0,
+				"model_name": "NotSet"
+			}
+		},
+		"model_params_1": {
+			"gazebo_name": "tii_gazebo",
+			"autopilot_name": "TII-Autopilot",
+			"autopilot_build_type": "px4_sitl_default",
+			"spawn_pose": [0, 2, 0.5, 0, 0, 0],
+			"instance": 1,
+			"generate_params":{
+				"base_model": "standard_vtol",
+				"sdf_version": "NotSet",
+				"mavlink_tcp_port": 4561,
+				"mavlink_udp_port": 14561,
+				"qgc_udp_port": 14551,
+				"sdk_udp_port": 14541,
 				"serial_enabled": 0,
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,

@@ -73,7 +73,47 @@
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
 			}
+		},
+		"system": {
+			"connections": {
+				"connection_0":{
+					"force_unbind": true,
+					"transport": "udp",
+					"ports": [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+				},
+				"connection_1":{
+					"force_unbind": false,
+					"transport": "tcp",
+					"ports": []
+				}
+			},
+			"set_environment": {
+				"environment_0": {
+					"variable": "GAZEBO_MODEL_DATABASE_URI",
+					"value": "",
+					"method": "overwrite"
+				},
+				"environment_1": {
+					"variable": "GAZEBO_RESOURCE_PATH",
+					"value": "/usr/share/gazebo-11",
+					"method": "overwrite"
+				},
+				"environment_2": {
+					"variable": "GAZEBO_RESOURCE_PATH",
+					"value": "/usr/share/gazebo-11",
+					"method": "prepend"
+				},
+				"environment_3": {
+					"variable": "JAVA_HOME",
+					"value": "/usr/lib/jvm/java-8-openjdk-amd64/",
+					"method": "ignore"
+				}
+			}
 		}
+	},
+	"verbose": {
+		"gzclient": false,
+		"gzserver": false
 	},
 	"nodes": {
 		"ros2_node_0":{
@@ -82,7 +122,8 @@
 			"executable": "nxp_track_vision",
 			"name": "nxp_track_vision",
 			"output": "screen",
-			"parameters": [{"pyramid_down": 2},{"debug": "True"}]
+			"parameters": [{"pyramid_down": 2},{"debug": "True"}],
+			"remappings": []
 		},
 		"ros2_node_1":{
 			"timing": "post-spawn",
@@ -90,7 +131,8 @@
 			"executable": "rqt_image_view",
 			"name": "rqt_image_view",
 			"output": "screen",
-			"parameters": []
+			"parameters": [],
+			"remappings": []
 		}
 	},
 	"world_params": {

@@ -20,7 +20,8 @@ import subprocess
 launch_path = os.path.realpath(__file__).replace("sim_gazebo.launch.py","")
 json_path = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../config")))
 ros2_ws = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../../..")))
-gazebo_verbose='true'
+gzclient_verbose='false'
+gzserver_verbose='false'
 
 # Initialize flags
 gazebo_model_reset_env=False
@@ -55,12 +56,21 @@ with open('{:s}/gen_params.json'.format(json_path)) as json_file:
 # Setup related configs
 setup_autopilot = json_params["setup"]["autopilot"]
 setup_gazebo = json_params["setup"]["gazebo"]
+setup_system = json_params["setup"]["system"]
 setup_ros2 = json_params["setup"]["ros2"]
+
 
 # Runtime related params
 ros2_nodes= json_params["nodes"]
 world_params = json_params["world_params"]
 models = json_params["models"]
+
+# Set verbose mode if present
+if "verbose" in json_params:
+    if "gzclient" in json_params["verbose"]:
+        gzclient_verbose = str(json_params["verbose"]["gzclient"]).lower()
+    if "gzserver" in json_params["verbose"]:
+        gzserver_verbose = str(json_params["verbose"]["gzserver"]).lower()
 
 ########################################################################################
 
@@ -92,7 +102,7 @@ for repo in setup_gazebo["gazebo_models"]:
         gazebo_model_reset_env=True
     
     # Append to Gazebo model path environment for subsequent repos if not present
-    elif '{:s}/models'.format(gazebo_repo_path) not in os.getenv('GAZEBO_MODEL_PATH'):
+    if gazebo_model_reset_env and ('{:s}/models'.format(gazebo_repo_path) not in os.getenv('GAZEBO_MODEL_PATH')):
         os.environ['GAZEBO_MODEL_PATH'] = '{:s}/models:{:s}'.format(
             gazebo_repo_path, os.getenv('GAZEBO_MODEL_PATH'))
 
@@ -165,7 +175,6 @@ for build in setup_autopilot:
 
     # Check to see if Gazebo plugin path environment variable is reset yet, if not reset to avoid plugin issues
     # Only include plugin if set to be used in JSON setup.autopilot.autopilot_build_params__.gazebo_plugins
-    # Plugins will be built outside of the autopilot repo in future
     if (not gazebo_plugin_reset_env and autopilot_build["source_gazebo_plugins"]) \
         and autopilot_build["build_postfix"] == 'gazebo':
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}/build_gazebo'.format(
@@ -191,7 +200,7 @@ for build in setup_gazebo["gazebo_plugins"]:
         plugin_build["workspace_relative_mavlink"])
     plugin_build_path = '{:s}/build'.format(plugin_path)
 
-    # Clone autopilot repo if not present
+    # Clone plugin repo if not present
     if (not os.path.isdir(plugin_path)):
         clone_cmd = 'git clone --recursive -b {:s} {:s} {:s}'.format(
             plugin_build["version"],plugin_build["repo"], plugin_path)
@@ -261,31 +270,44 @@ for build in setup_gazebo["gazebo_plugins"]:
             plugin_build_path, os.getenv('LD_LIBRARY_PATH'))
 
     # Check to see if Gazebo plugin path environment variable is reset yet, if not reset to avoid plugin issues
-    # Only include plugin if set to be used in JSON setup.autopilot.autopilot_build_params__.gazebo_plugins
-    # Plugins will be built outside of the autopilot repo in future
     if not gazebo_plugin_reset_env and plugin_build["source_gazebo_plugins"]:
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}'.format(
             plugin_build_path)
         gazebo_plugin_reset_env=True
     
-    # Append to Gazebo plugin path environment for subsequent builds if not present and set to be used
+    # Append to Gazebo plugin path environment for subsequent repos if not present and set to be used
     elif plugin_build["source_gazebo_plugins"] and ('{:s}/build_gazebo'.format(plugin_build_path) 
         not in os.getenv('GAZEBO_PLUGIN_PATH')):
         os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}:{:s}'.format(
             plugin_build_path, os.getenv('GAZEBO_PLUGIN_PATH'))
 
-# Always default plugins if no other plugins are set
+########################################################################################
+
+# Set environment variables if present
+if "set_environment" in setup_system:
+    for env in setup_system["set_environment"]:
+        set_env = setup_system["set_environment"][env]
+        if set_env["method"] == "overwrite":
+            os.environ[set_env["variable"]] = set_env["value"]
+        elif set_env["method"] == "prepend":
+            if os.getenv(set_env["variable"]) is None:
+                os.environ[set_env["variable"]] = set_env["value"]
+            else:
+                os.environ[set_env["variable"]] = '{:s}:{:s}'.format(
+                    set_env["value"], os.getenv(set_env["variable"]))
+        elif set_env["method"] == "postpend":
+            if os.getenv(set_env["variable"]) is None:
+                os.environ[set_env["variable"]] = set_env["value"]
+            else:
+                os.environ[set_env["variable"]] = '{:s}:{:s}'.format(
+                    os.getenv(set_env["variable"]), set_env["value"])
+
+# Always use default if none set
 if os.getenv('GAZEBO_PLUGIN_PATH') is None:
     os.environ['GAZEBO_PLUGIN_PATH'] = "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins"
+if os.getenv('GAZEBO_RESOURCE_PATH') is None:
+    os.environ['GAZEBO_RESOURCE_PATH'] = "/usr/share/gazebo-11"
 
-# Add default plugins if not present
-#elif "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins" not in os.getenv('GAZEBO_PLUGIN_PATH'):
-#    os.environ['GAZEBO_PLUGIN_PATH'] = '{:s}:{:s}'.format(
-#            "/usr/lib/x86_64-linux-gnu/gazebo-11/plugins", 
-#            os.getenv('GAZEBO_PLUGIN_PATH'))
-
-# set Gazebo resource path
-#os.environ['GAZEBO_RESOURCE_PATH'] = "/usr/share/gazebo-11"
 
 ########################################################################################
 
@@ -320,17 +342,12 @@ for build in setup_ros2:
             if output:
                 print(output.strip())
         build_popen.wait()
+
+# Require restart if colcon packages built so they can be correctly found
 if built_ros2_pkgs:
     src_ros2_ws = '{:s}/install/setup.bash'.format(ros2_ws)
     os.system('/bin/bash {:s}'.format(src_ros2_ws))
     os.system("/bin/bash /opt/ros/foxy/setup.bash")
-    sleep(2)
-    #Only works on some system setups with correct .bashrc
-    #os.system('''gnome-terminal -t \"MAGIC\" -- bash -c \'echo 
-    #    \"Sourcing sim_gazebo workspace\"; /bin/bash {:s}; 
-    #    echo \"Sourcing ROS2 Foxy\"; /bin/bash /opt/ros/foxy/setup.bash; 
-    #    echo \"Relaunching ROS2\"; ros2 launch sim_gazebo_bringup sim_gazebo.launch.py; 
-    #    bash\''''.format(src_ros2_ws).replace("\n","").replace("    ",""))
     print('''\n\n\nPLEASE RUN:\n 
         source {:s}; source /opt/ros/foxy/setup.bash; ros2 launch sim_gazebo_bringup sim_gazebo.launch.py
         \n\n'''.format(src_ros2_ws))
@@ -338,6 +355,24 @@ if built_ros2_pkgs:
 
 ########################################################################################
 
+# Unbind connections if bound, this can be dangerous 
+# as it will kill any processes bound to that connection.
+if "connections" in setup_system:
+    for connection in setup_system["connections"]:
+        unbind_connection = setup_system["connections"][connection]
+        if unbind_connection["force_unbind"]:
+            for port in unbind_connection["ports"]:
+                try:
+                    os.system('fuser -k {:s}/{:s}'.format(
+                        str(port),str(unbind_connection["transport"]).lower()))
+                except OSError as error: 
+                    print('\n{:s} unbind failed for port: {:s}\n'.format(
+                        str(unbind_connection["transport"]).lower(), str(port)))
+
+
+########################################################################################
+
+# Generate the world
 generate_world_params = world_params["generate_params"]
 if world_params["generate_world"]:
     generate_world_args=""
@@ -365,6 +400,7 @@ else:
     world_file_path='{:s}/{:s}/worlds/{:s}.world'.format(ros2_ws,
         world_params["gazebo_name"],generate_world_params["world_name"])
 
+# Set relevant world values
 latitude = generate_world_params["latitude"]
 longitude = generate_world_params["longitude"]
 altitude = generate_world_params["altitude"]
@@ -374,15 +410,16 @@ altitude = generate_world_params["altitude"]
 def generate_launch_description():
 
     ld = LaunchDescription([
-    	# World path argument
+        # World path argument
         DeclareLaunchArgument(
             'world_path', default_value= world_file_path,
             description='Provide full world file path and name'),
         DeclareLaunchArgument(
-            'verbose', default_value= gazebo_verbose,
-            description='Run in verbose mode'),
-        LogInfo(msg=LaunchConfiguration('world_path')),
-        LogInfo(msg=LaunchConfiguration('verbose')),
+            'gzserver_verbose', default_value= gzserver_verbose,
+            description='Run gzserver in verbose mode'),
+        DeclareLaunchArgument(
+            'gzclient_verbose', default_value= gzclient_verbose,
+            description='Run gzclient in verbose mode'),
         ])
 
     # Get path to gazebo package
@@ -393,13 +430,14 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource([gazebo_package_prefix,'/launch/gzserver.launch.py']),
                 launch_arguments={
                     'world': LaunchConfiguration('world_path'),
-                    'verbose': LaunchConfiguration('verbose')
+                    'verbose': LaunchConfiguration('gzserver_verbose')
                     }.items(),
                 )
     
     ld.add_action(gazebo_server)
 
     ####################################################################################
+
     # pre-spawn ROS2 Nodes
     for node in ros2_nodes:
         ros2_node = ros2_nodes[node]
@@ -410,7 +448,8 @@ def generate_launch_description():
                 executable=ros2_node["executable"],
                 name=ros2_node["name"], 
                 output=ros2_node["output"],
-                parameters=ros2_node["parameters"])
+                parameters=ros2_node["parameters"],
+                remappings=ros2_node["remappings"])
 
             ld.add_action(prespawn_node)
 
@@ -426,17 +465,16 @@ def generate_launch_description():
             generate_model_params["model_name"] = 'sitl_{:s}_{:d}'.format(
                 generate_model_params["base_model"],instance)
 
-                # See if rtps_args exist for model
+        # See if rtps_args exist for model
         if "rtps_agent_args" in models[model_params]:
 
             # Command to run micrortps agent based on instance if present but "NotSet"
             if models[model_params]["rtps_agent_args"] == "NotSet":
-                urtps_agent_cmd = '''eval \"micrortps_agent -t UDP -r {:s} -s {:s}\"; 
+                urtps_agent_cmd = '''eval \"micrortps_agent -n  -t UDP -r {:s} -s {:s}\"; 
                     bash'''.format(str(2019+(2*instance)), str(2020+(2*instance))
                         ).replace("\n","").replace("    ","")
 
-            # Command to run micrortps agent with assigned args since
-            # instance micrortps_client is broken
+            # Command to run micrortps agent with assigned args
             else:
                 urtps_agent_cmd = '''eval \"micrortps_agent {:s}\"; 
                     bash'''.format(models[model_params]["rtps_agent_args"]
@@ -550,7 +588,8 @@ def generate_launch_description():
                 executable=ros2_node["executable"],
                 name=ros2_node["name"], 
                 output=ros2_node["output"],
-                parameters=ros2_node["parameters"])
+                parameters=ros2_node["parameters"],
+                remappings=ros2_node["remappings"])
 
             ld.add_action(postspawn_node)
 
@@ -560,7 +599,7 @@ def generate_launch_description():
     gazebo_client = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gazebo_package_prefix,'/launch/gzclient.launch.py']),
         launch_arguments={
-                    'verbose': LaunchConfiguration('verbose')
+                    'verbose': LaunchConfiguration('gzclient_verbose')
                     }.items(),
         )
     
