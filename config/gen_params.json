@@ -51,7 +51,7 @@
 			},
 			"ros2_repo_2":{
 				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
-				"version": "main",
+				"version": "fire_turtle",
 				"build_package": "nxp_cup_vision",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
