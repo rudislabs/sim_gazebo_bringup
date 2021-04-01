@@ -17,6 +17,11 @@
 					"repo": "git@github.com:rudislabs/tii_gazebo.git",
 					"version": "fire_turtle",
 					"name": "tii_gazebo"
+				},
+				"gazebo_model_repo_1":{
+					"repo": "git@github.com:osrf/gazebo_models.git",
+					"version": "master",
+					"name": "osrf/models"
 				}
 			},
 			"gazebo_plugins": {
@@ -53,7 +58,7 @@
 				"environment_1": {
 					"variable": "GAZEBO_RESOURCE_PATH",
 					"value": "/usr/share/gazebo-11",
-					"method": "overwrite"
+					"method": "prepend"
 				},
 				"environment_2": {
 					"variable": "JAVA_HOME",
@@ -72,23 +77,44 @@
 		"gazebo_name": "tii_gazebo",
 		"generate_world": 0,
 		"generate_params":{
-			"sdf_version": "NotSet",
-			"sun_model": "sunSolarNoon",
-			"sun_utc_date": "1904_09_20_17_30",
-			"cloud_speed": "NoClouds",
-			"shadows": 1,
-			"video_widget": "NotSet",
-			"update_rate": 250,
-			"wind_speed": "NotSet",
-			"realtime_factor": 1.0,
 			"world_name": "abu_dhabi",
+			"sdf_version": "1.6",
+			"use_spherical_coords": 1,
+			"lat_lon_alt": [24.495296, 54.3764920, 0],
+			"sun_model": "sunUTC",
+			"sun_utc_date": "1971/12/02/08:00",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
-			"spherical_coords": 1,
-			"latitude": 39.8039,
-			"longitude": -84.0606,
-			"altitude": 244,
-			"irlock_beacon_pose": "NotSet",
+			"shadows": 1,
+			"cloud_speed": 12,
+			"wind_speed": "NotSet",
+			"fog_params": {
+				"type": "linear",
+				"start_m": 1.5,
+				"end_m": 50.5,
+				"density": 2.5
+			},			
+			"embedded_models": {
+				"embed_model_0": {
+					"model": "stop_light_post",
+					"name": "stop_light_post_0",
+					"pose": "1 1 0 0 0 0"
+				},
+				"embed_model_1": {
+					"model": "coke_can",
+					"name": "coke_can_1",
+					"pose": "0 1 .2 0 0 0"
+				},
+				"embed_model_2": {
+					"model": "stop_sign",
+					"name": "beer_2",
+					"pose": "1 0 .2 0 0 0"
+				}
+			},
+			"video_widget": "NotSet",
+			"set_physics": 0,
+			"update_rate": 100,
+			"realtime_factor": 1.0,
 			"ode_threads": 2
 		}
 	},
@@ -100,6 +126,7 @@
 			"spawn_pose": [0, 0, 0.5, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
+				"controller": "px4",
 				"base_model": "iris",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4560,
@@ -113,6 +140,8 @@
 				"gps_attack_time": 20,
 				"gps_attack_rate": 0.2,
 				"gps_model_name": "NotSet",
+				"camera_image": "NotSet",
+				"namespace": "NotSet",
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
@@ -124,6 +153,7 @@
 			"spawn_pose": [0, 2, 0.5, 0, 0, 0],
 			"instance": 1,
 			"generate_params":{
+				"controller": "px4",
 				"base_model": "standard_vtol",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4561,
@@ -137,6 +167,8 @@
 				"gps_attack_time": 20,
 				"gps_attack_rate": 0.2,
 				"gps_model_name": "NotSet",
+				"camera_image": "NotSet",
+				"namespace": "NotSet",
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
