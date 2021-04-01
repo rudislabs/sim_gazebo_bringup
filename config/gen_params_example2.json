@@ -32,12 +32,17 @@
 					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
 					"version": "fire_turtle",
 					"name": "nxp_gazebo"
+				},
+				"gazebo_model_repo_2":{
+					"repo": "git@github.com:osrf/gazebo_models.git",
+					"version": "master",
+					"name": "osrf/models"
 				}
 			},
 			"gazebo_plugins": {
 				"gazebo_plugin_repo_0":{
 					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
-					"version": "master",
+					"version": "gps_attack",
 					"name": "tii_gazebo_plugins",
 					"workspace_relative_mavlink": "TII-Autopilot/mavlink/include/",
 					"source_gazebo_plugins": 1
@@ -96,61 +101,89 @@
 				"environment_1": {
 					"variable": "GAZEBO_RESOURCE_PATH",
 					"value": "/usr/share/gazebo-11",
-					"method": "overwrite"
+					"method": "prepend"
 				},
 				"environment_2": {
 					"variable": "JAVA_HOME",
 					"value": "/usr/lib/jvm/java-8-openjdk-amd64/",
 					"method": "ignore"
+				},
+				"environment_3": {
+					"variable": "GAZEBO_PLUGIN_PATH",
+					"value": "/opt/ros/foxy/lib",
+					"method": "prepend"
 				}
 			}
 		}
 	},
 	"verbose": {
-		"gzclient": false,
-		"gzserver": false
+		"gzclient": true,
+		"gzserver": true
 	},
 	"nodes": {
 		"ros2_node_0":{
 			"timing": "post-spawn",
 			"package": "nxp_cup_vision",
 			"executable": "nxp_track_vision",
-			"name": "nxp_track_vision",
+			"name": "nxp_track_vision_0",
 			"output": "screen",
-			"parameters": [{"pyramid_down": 2},{"debug": "True"}],
-			"remappings": []
+			"parameters": [	{"pyramid_down": 2},
+							{"camera_image": "trackImage0"},
+							{"debug_image": "debugImage0"},
+							{"namespace": "cupcar0"}
+						]
 		},
-		"ros2_node_1":{
+		"ros2_node_2":{
 			"timing": "post-spawn",
 			"package": "rqt_image_view",
 			"executable": "rqt_image_view",
-			"name": "rqt_image_view",
+			"name": "rqt_image_view_0",
 			"output": "screen",
-			"parameters": [],
-			"remappings": []
+			"parameters": []
 		}
 	},
 	"world_params": {
 		"gazebo_name": "nxp_gazebo",
 		"generate_world": 0,
 		"generate_params":{
-			"sdf_version": "NotSet",
-			"sun_model": "sunSolarNoon",
-			"sun_utc_date": "1904_09_20_17_30",
-			"cloud_speed": "NoClouds",
-			"shadows": 1,
-			"video_widget": "NotSet",
-			"update_rate": 250,
-			"wind_speed": "NotSet",
-			"realtime_factor": 1.0,
 			"world_name": "nxp_raceway_overpass",
+			"sdf_version": "1.6",
+			"use_spherical_coords": 1,
+			"lat_lon_alt": [39.8039, -84.0606, 244],
+			"sun_model": "sunUTC",
+			"sun_utc_date": "1904/09/20/17:30",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
-			"spherical_coords": 1,
-			"latitude": 39.8039,
-			"longitude": -84.0606,
-			"altitude": 244,
-			"irlock_beacon_pose": "NotSet",
+			"shadows": 1,
+			"cloud_speed": 12,
+			"wind_speed": "NotSet",
+			"fog_params": {
+				"type": "linear",
+				"start_m": 1.5,
+				"end_m": 50.5,
+				"density": 2.5
+			},			
+			"embedded_models": {
+				"embed_model_0": {
+					"model": "stop_light_post",
+					"name": "stop_light_post_0",
+					"pose": "1 1 0 0 0 0"
+				},
+				"embed_model_1": {
+					"model": "coke_can",
+					"name": "coke_can_1",
+					"pose": "0 1 .2 0 0 0"
+				},
+				"embed_model_2": {
+					"model": "stop_sign",
+					"name": "beer_2",
+					"pose": "1 0 .2 0 0 0"
+				}
+			},
+			"video_widget": "NotSet",
+			"set_physics": 0,
+			"update_rate": 100,
+			"realtime_factor": 1.0,
 			"ode_threads": 2
 		}
 	},
@@ -158,13 +191,14 @@
 		"model_params_0": {
 			"gazebo_name": "nxp_gazebo",
 			"autopilot_name": "NXP-Autopilot",
-			"rtps_arg": "-t UDP -r 2019 -s 2020",
+			"rtps_arg": "NotSet",
 			"autopilot_build_type": "px4_sitl_rtps",
 			"spawn_pose": [0, 0, 0.2, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
+				"controller": "ros2",
 				"base_model": "nxp_cupcar",
-				"sdf_version": "NotSet",
+				"sdf_version": 1.6,
 				"mavlink_tcp_port": 4560,
 				"mavlink_udp_port": 14560,
 				"qgc_udp_port": 14550,
@@ -173,6 +207,8 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
+				"camera_image": "trackImage0",
+				"namespace": "cupcar0",
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
@@ -184,6 +220,7 @@
 			"spawn_pose": [0, 2, 0.3, 0, 0, 0],
 			"instance": 1,
 			"generate_params":{
+				"controller": "px4",
 				"base_model": "iris",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4561,
@@ -194,6 +231,8 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
+				"camera_image": "NotSet",
+				"namespace": "NotSet",
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
