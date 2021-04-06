@@ -22,6 +22,11 @@
 					"repo": "git@github.com:osrf/gazebo_models.git",
 					"version": "master",
 					"name": "osrf/models"
+				},
+				"gazebo_model_repo_3":{
+					"repo": "git@github.com:rudislabs/tii_gazebo.git",
+					"version": "fire_turtle",
+					"name": "tii_gazebo"
 				}
 			},
 			"gazebo_plugins": {
@@ -105,7 +110,7 @@
 			"executable": "nxp_track_vision",
 			"name": "nxp_track_vision_0",
 			"output": "screen",
-			"parameters": [	{"pyramid_down": 2},
+			"parameters": [	{"pyramid_down": 3},
 							{"camera_image": "trackImage0"},
 							{"debug_image": "debugImage0"},
 							{"namespace": "cupcar0"}
@@ -127,9 +132,9 @@
 			"world_name": "nxp_raceway_overpass",
 			"sdf_version": "1.6",
 			"use_spherical_coords": 1,
-			"lat_lon_alt": [39.8039, -84.0606, 244],
+			"lat_lon_alt": [28.6139, -77.2090, 100],
 			"sun_model": "sunUTC",
-			"sun_utc_date": "1904/09/20/17:30",
+			"sun_utc_date": "now",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
 			"shadows": 1,
@@ -140,22 +145,67 @@
 				"start_m": 1.5,
 				"end_m": 50.5,
 				"density": 2.5
-			},			
+			},	
 			"embedded_models": {
 				"embed_model_0": {
-					"model": "stop_light_post",
-					"name": "stop_light_post_0",
-					"pose": "1 1 0 0 0 0"
+					"model": "start_point",
+					"name": "start_point_0",
+					"pose": "0.2 -0.45 0.09 0 0 0"
 				},
 				"embed_model_1": {
-					"model": "coke_can",
-					"name": "coke_can_1",
-					"pose": "0 1 .2 0 0 0"
+					"model": "start_point",
+					"name": "start_point_1",
+					"pose": "0.2 0.45 0.09 0 0 0"
 				},
 				"embed_model_2": {
-					"model": "stop_sign",
-					"name": "beer_2",
-					"pose": "1 0 .2 0 0 0"
+					"model": "coke_can",
+					"name": "coke_0",
+					"pose": ".4 0 0 0 0 0"
+				},
+				"embed_model_3": {
+					"model": "coke_can",
+					"name": "coke_1",
+					"pose": ".5 .05 0 0 0 0"
+				},
+				"embed_model_4": {
+					"model": "coke_can",
+					"name": "coke_2",
+					"pose": ".5 -.05 0 0 0 0"
+				},
+				"embed_model_5": {
+					"model": "coke_can",
+					"name": "coke_3",
+					"pose": ".6 0 0 0 0 0"
+				},
+				"embed_model_6": {
+					"model": "coke_can",
+					"name": "coke_4",
+					"pose": ".6 -.1 0 0 0 0"
+				},
+				"embed_model_7": {
+					"model": "coke_can",
+					"name": "coke_5",
+					"pose": ".6 0.1 0 0 0 0"
+				},
+				"embed_model_8": {
+					"model": "coke_can",
+					"name": "coke_6",
+					"pose": ".7 -.05 0 0 0 0"
+				},
+				"embed_model_9": {
+					"model": "coke_can",
+					"name": "coke_7",
+					"pose": ".7 0.05 0 0 0 0"
+				},
+				"embed_model_10": {
+					"model": "coke_can",
+					"name": "coke_8",
+					"pose": ".7 0.15 0 0 0 0"
+				},
+				"embed_model_11": {
+					"model": "coke_can",
+					"name": "coke_9",
+					"pose": ".7 -0.15 0 0 0 0"
 				}
 			},
 			"video_widget": "NotSet",
@@ -168,26 +218,14 @@
 	"models": {
 		"model_params_0": {
 			"gazebo_name": "nxp_gazebo",
-			"autopilot_name": "NXP-Autopilot",
-			"rtps_agent_args": "NotSet",
-			"autopilot_build_type": "px4_sitl_rtps",
-			"spawn_pose": [0, 0, 0.2, 0, 0, 0],
+			"spawn_pose": [0, 0, 0.1, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
 				"controller": "ros2",
 				"base_model": "nxp_cupcar",
 				"sdf_version": 1.6,
-				"mavlink_tcp_port": 4560,
-				"mavlink_udp_port": 14560,
-				"qgc_udp_port": 14550,
-				"sdk_udp_port": 14540,
-				"serial_enabled": 0,
-				"serial_device": "/dev/ttyACM0",
-				"serial_baudrate": 921600,
-				"enable_lockstep": 1,
 				"camera_image": "trackImage0",
 				"namespace": "cupcar0",
-				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
 		}
