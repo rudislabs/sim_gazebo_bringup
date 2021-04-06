@@ -2,21 +2,21 @@
 		"autopilot": {
 			"autopilot_build_params_0": {
 				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
-				"name": "NXP-Autopilot",
-				"version": "pr-cupcar-v2",
+				"name": "TII-Autopilot",
+				"version": "tii_v2",
 				"clone": 1,
 				"source_gazebo_plugins": 0,
-				"build_type": "px4_sitl_rtps",
+				"build_type": "px4_sitl_default",
 				"build_prefix": "DONT_RUN=1",
 				"build_postfix": ""
 			}
 		},
 		"gazebo": {
 			"gazebo_models": {
-				"gazebo_model_repo_0":{
-					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
+				"gazebo_repo_0":{
+					"repo": "git@github.com:rudislabs/tii_gazebo.git",
 					"version": "fire_turtle",
-					"name": "nxp_gazebo"
+					"name": "tii_gazebo"
 				},
 				"gazebo_model_repo_1":{
 					"repo": "git@github.com:osrf/gazebo_models.git",
@@ -27,35 +27,14 @@
 			"gazebo_plugins": {
 				"gazebo_plugin_repo_0":{
 					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
-					"version": "master",
-					"name": "nxp_gazebo_plugins",
-					"workspace_relative_mavlink": "NXP-Autopilot/mavlink/include/",
-					"source_gazebo_plugins": 0
+					"version": "gps_attack",
+					"name": "tii_gazebo_plugins",
+					"workspace_relative_mavlink": "TII-Autopilot/mavlink/include/",
+					"source_gazebo_plugins": 1
 				}
 			}
 		},
 		"ros2": {
-			"ros2_repo_0":{
-				"repo": "git@github.com:rudislabs/px4_msgs.git",
-				"version": "pr-cupcar",
-				"build_package": "px4_msgs",
-				"build_prefix": "--packages-select",
-				"build_postfix": "--symlink-install"
-			},
-			"ros2_repo_1":{
-				"repo": "git@github.com:rudislabs/px4_ros_com.git",
-				"version": "pr-cupcar",
-				"build_package": "px4_ros_com",
-				"build_prefix": "--packages-select",
-				"build_postfix": "--symlink-install"
-			},
-			"ros2_repo_2":{
-				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
-				"version": "main",
-				"build_package": "nxp_cup_vision",
-				"build_prefix": "--packages-select",
-				"build_postfix": "--symlink-install"
-			}
 		},
 		"system": {
 			"connections": {
@@ -85,11 +64,6 @@
 					"variable": "JAVA_HOME",
 					"value": "/usr/lib/jvm/java-8-openjdk-amd64/",
 					"method": "ignore"
-				},
-				"environment_3": {
-					"variable": "GAZEBO_PLUGIN_PATH",
-					"value": "/opt/ros/foxy/lib",
-					"method": "prepend"
 				}
 			}
 		}
@@ -98,38 +72,17 @@
 		"gzclient": true,
 		"gzserver": true
 	},
-	"nodes": {
-		"ros2_node_0":{
-			"timing": "post-spawn",
-			"package": "nxp_cup_vision",
-			"executable": "nxp_track_vision",
-			"name": "nxp_track_vision_0",
-			"output": "screen",
-			"parameters": [	{"pyramid_down": 2},
-							{"camera_image": "trackImage0"},
-							{"debug_image": "debugImage0"},
-							{"namespace": "cupcar0"}
-						]
-		},
-		"ros2_node_2":{
-			"timing": "post-spawn",
-			"package": "rqt_image_view",
-			"executable": "rqt_image_view",
-			"name": "rqt_image_view_0",
-			"output": "screen",
-			"parameters": []
-		}
-	},
+	"nodes": {},
 	"world_params": {
-		"gazebo_name": "nxp_gazebo",
+		"gazebo_name": "tii_gazebo",
 		"generate_world": 1,
 		"generate_params":{
-			"world_name": "nxp_raceway_overpass",
+			"world_name": "abu_dhabi",
 			"sdf_version": "1.6",
 			"use_spherical_coords": 1,
-			"lat_lon_alt": [39.8039, -84.0606, 244],
+			"lat_lon_alt": [24.495296, 54.3764920, 0],
 			"sun_model": "sunUTC",
-			"sun_utc_date": "1904/09/20/17:30",
+			"sun_utc_date": "1971/12/02/08:00",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
 			"shadows": 1,
@@ -137,25 +90,20 @@
 			"wind_speed": "NotSet",
 			"fog_params": {
 				"type": "linear",
-				"start_m": 1.5,
-				"end_m": 50.5,
-				"density": 2.5
+				"start_m": 50,
+				"end_m": 500,
+				"density": 1
 			},			
 			"embedded_models": {
 				"embed_model_0": {
-					"model": "stop_light_post",
-					"name": "stop_light_post_0",
-					"pose": "1 1 0 0 0 0"
+					"model": "coke_can",
+					"name": "coke_can_0",
+					"pose": "3 3 0 0 0 0"
 				},
 				"embed_model_1": {
 					"model": "coke_can",
 					"name": "coke_can_1",
-					"pose": "0 1 .2 0 0 0"
-				},
-				"embed_model_2": {
-					"model": "stop_sign",
-					"name": "beer_2",
-					"pose": "1 0 .2 0 0 0"
+					"pose": "3 3.1 0 0 0 0"
 				}
 			},
 			"video_widget": "NotSet",
@@ -167,16 +115,15 @@
 	},
 	"models": {
 		"model_params_0": {
-			"gazebo_name": "nxp_gazebo",
-			"autopilot_name": "NXP-Autopilot",
-			"rtps_agent_args": "NotSet",
-			"autopilot_build_type": "px4_sitl_rtps",
-			"spawn_pose": [0, 0, 0.2, 0, 0, 0],
+			"gazebo_name": "tii_gazebo",
+			"autopilot_name": "TII-Autopilot",
+			"autopilot_build_type": "px4_sitl_default",
+			"spawn_pose": [0, 0, 0.5, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
-				"controller": "ros2",
-				"base_model": "nxp_cupcar",
-				"sdf_version": 1.6,
+				"controller": "px4",
+				"base_model": "iris",
+				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4560,
 				"mavlink_udp_port": 14560,
 				"qgc_udp_port": 14550,
@@ -185,8 +132,38 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
-				"camera_image": "trackImage0",
-				"namespace": "cupcar0",
+				"gps_attack_time": 20,
+				"gps_attack_rate": 0.2,
+				"gps_model_name": "NotSet",
+				"camera_image": "NotSet",
+				"namespace": "NotSet",
+				"hil_mode": 0,
+				"model_name": "NotSet"
+			}
+		},
+		"model_params_1": {
+			"gazebo_name": "tii_gazebo",
+			"autopilot_name": "TII-Autopilot",
+			"autopilot_build_type": "px4_sitl_default",
+			"spawn_pose": [0, 2, 0.5, 0, 0, 0],
+			"instance": 1,
+			"generate_params":{
+				"controller": "px4",
+				"base_model": "standard_vtol",
+				"sdf_version": "NotSet",
+				"mavlink_tcp_port": 4561,
+				"mavlink_udp_port": 14561,
+				"qgc_udp_port": 14551,
+				"sdk_udp_port": 14541,
+				"serial_enabled": 0,
+				"serial_device": "/dev/ttyACM0",
+				"serial_baudrate": 921600,
+				"enable_lockstep": 1,
+				"gps_attack_time": 20,
+				"gps_attack_rate": 0.2,
+				"gps_model_name": "NotSet",
+				"camera_image": "NotSet",
+				"namespace": "NotSet",
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}

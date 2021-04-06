@@ -22,7 +22,7 @@ json_path = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../config
 ros2_ws = os.path.realpath(os.path.relpath(os.path.join(launch_path,"../../..")))
 
 # Set useful variables
-default_controller="garbage"
+default_controller="px4"
 gzclient_verbose='false'
 gzserver_verbose='false'
 
@@ -34,7 +34,7 @@ has_reset_ld_library_env=True
 has_reset_sitl_gazebo_path_env=False
 has_built_ros2_pkgs=False
 clean_start=True
-debug_verbose=True
+debug_verbose=False
 overide_gazebo=False
 
 # Clear /tmp output from previous runs
@@ -479,10 +479,6 @@ def generate_launch_description():
                         'verbose': LaunchConfiguration('gzclient_verbose')
                         }.items(),
             )
-
-        LogInfo(msg="\nWaiting to launch Gazebo Client...\n")
-        print("\nWaiting to launch Gazebo Client...\n")
-        sleep(3)
 
         ld.add_action(gazebo_client)
 
