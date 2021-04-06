@@ -17,16 +17,16 @@
 		},
 		"ros2": {
 			"ros2_repo_0":{
-				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
+				"repo": "git@github.com:rudislabs/nxp_cup_interfaces.git",
 				"version": "aim",
-				"build_package": "nxp_cup_vision",
+				"build_package": "nxp_cup_interfaces",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
 			},
 			"ros2_repo_1":{
-				"repo": "git@github.com:rudislabs/nxp_cup_msgs.git",
+				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
 				"version": "aim",
-				"build_package": "nxp_cup_msgs",
+				"build_package": "nxp_cup_vision",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
 			}
