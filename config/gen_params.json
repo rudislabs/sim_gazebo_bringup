@@ -1,80 +1,37 @@
 {	"setup":{
-		"autopilot": {
-			"autopilot_build_params_0": {
-				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
-				"name": "NXP-Autopilot",
-				"version": "pr-cupcar-v2",
-				"clone": 1,
-				"source_gazebo_plugins": 0,
-				"build_type": "px4_sitl_rtps",
-				"build_prefix": "DONT_RUN=1",
-				"build_postfix": ""
-			}
-		},
+		"autopilot": {},
 		"gazebo": {
 			"gazebo_models": {
 				"gazebo_model_repo_0":{
 					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
-					"version": "fire_turtle",
+					"version": "aim",
 					"name": "nxp_gazebo"
 				},
 				"gazebo_model_repo_1":{
 					"repo": "git@github.com:osrf/gazebo_models.git",
 					"version": "master",
 					"name": "osrf/models"
-				},
-				"gazebo_model_repo_3":{
-					"repo": "git@github.com:rudislabs/tii_gazebo.git",
-					"version": "fire_turtle",
-					"name": "tii_gazebo"
 				}
 			},
-			"gazebo_plugins": {
-				"gazebo_plugin_repo_0":{
-					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
-					"version": "master",
-					"name": "nxp_gazebo_plugins",
-					"workspace_relative_mavlink": "NXP-Autopilot/mavlink/include/",
-					"source_gazebo_plugins": 0
-				}
-			}
+			"gazebo_plugins": {}
 		},
 		"ros2": {
 			"ros2_repo_0":{
-				"repo": "git@github.com:rudislabs/px4_msgs.git",
-				"version": "pr-cupcar",
-				"build_package": "px4_msgs",
+				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
+				"version": "aim",
+				"build_package": "nxp_cup_vision",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
 			},
 			"ros2_repo_1":{
-				"repo": "git@github.com:rudislabs/px4_ros_com.git",
-				"version": "pr-cupcar",
-				"build_package": "px4_ros_com",
-				"build_prefix": "--packages-select",
-				"build_postfix": "--symlink-install"
-			},
-			"ros2_repo_2":{
-				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
-				"version": "fire_turtle",
-				"build_package": "nxp_cup_vision",
+				"repo": "git@github.com:rudislabs/nxp_cup_msgs.git",
+				"version": "aim",
+				"build_package": "nxp_cup_msgs",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
 			}
 		},
 		"system": {
-			"connections": {
-				"connection_0":{
-					"force_unbind": true,
-					"transport": "udp",
-					"ports": [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
-				},
-				"connection_1":{
-					"force_unbind": false,
-					"transport": "tcp",
-					"ports": []
-				}
-			},
 			"set_environment": {
 				"environment_0": {
 					"variable": "GAZEBO_MODEL_DATABASE_URI",
@@ -87,11 +44,6 @@
 					"method": "prepend"
 				},
 				"environment_2": {
-					"variable": "JAVA_HOME",
-					"value": "/usr/lib/jvm/java-8-openjdk-amd64/",
-					"method": "ignore"
-				},
-				"environment_3": {
 					"variable": "GAZEBO_PLUGIN_PATH",
 					"value": "/opt/ros/foxy/lib",
 					"method": "prepend"
@@ -156,56 +108,6 @@
 					"model": "start_point",
 					"name": "start_point_1",
 					"pose": "0.2 0.45 0.09 0 0 0"
-				},
-				"embed_model_2": {
-					"model": "coke_can",
-					"name": "coke_0",
-					"pose": ".4 0 0 0 0 0"
-				},
-				"embed_model_3": {
-					"model": "coke_can",
-					"name": "coke_1",
-					"pose": ".5 .05 0 0 0 0"
-				},
-				"embed_model_4": {
-					"model": "coke_can",
-					"name": "coke_2",
-					"pose": ".5 -.05 0 0 0 0"
-				},
-				"embed_model_5": {
-					"model": "coke_can",
-					"name": "coke_3",
-					"pose": ".6 0 0 0 0 0"
-				},
-				"embed_model_6": {
-					"model": "coke_can",
-					"name": "coke_4",
-					"pose": ".6 -.1 0 0 0 0"
-				},
-				"embed_model_7": {
-					"model": "coke_can",
-					"name": "coke_5",
-					"pose": ".6 0.1 0 0 0 0"
-				},
-				"embed_model_8": {
-					"model": "coke_can",
-					"name": "coke_6",
-					"pose": ".7 -.05 0 0 0 0"
-				},
-				"embed_model_9": {
-					"model": "coke_can",
-					"name": "coke_7",
-					"pose": ".7 0.05 0 0 0 0"
-				},
-				"embed_model_10": {
-					"model": "coke_can",
-					"name": "coke_8",
-					"pose": ".7 0.15 0 0 0 0"
-				},
-				"embed_model_11": {
-					"model": "coke_can",
-					"name": "coke_9",
-					"pose": ".7 -0.15 0 0 0 0"
 				}
 			},
 			"video_widget": "NotSet",
