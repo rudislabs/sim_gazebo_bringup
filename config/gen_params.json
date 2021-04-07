@@ -72,7 +72,9 @@
 			"parameters": [	{"pyramid_down": 3},
 							{"camera_image": "trackImage0"},
 							{"debug_image": "debugImage0"},
-							{"namespace": "cupcar0"}
+							{"namespace": "cupcar0"},
+							{"mask_ratio_array": [1.0, 0.4]}
+
 						]
 		},
 		"ros2_node_1":{
@@ -89,10 +91,11 @@
 			"executable": "line_follower",
 			"name": "line_follower_0",
 			"output": "screen",
-			"parameters": [	{"start_delay": 10.0},
+			"parameters": [	{"start_delay": 5.0},
 							{"camera_vector_topic": "/cupcar0/PixyVector"},
-							{"linear_velocity": 1.5},
-							{"angular_velocity": -1.2}
+							{"linear_velocity": 2.0},
+							{"angular_velocity": -0.8},
+							{"single_line_steer_scale": 0.6}
 						]
 		}
 	},
@@ -100,7 +103,7 @@
 		"gazebo_name": "nxp_gazebo",
 		"generate_world": 1,
 		"generate_params":{
-			"world_name": "nxp_raceway_overpass",
+			"world_name": "canvas",
 			"sdf_version": "1.6",
 			"use_spherical_coords": 1,
 			"lat_lon_alt": [28.6139, -77.2090, 100],
@@ -108,22 +111,21 @@
 			"sun_utc_date": "now",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
-			"shadows": 1,
+			"shadows": 0,
 			"cloud_speed": 12,
 			"wind_speed": "NotSet",
-			"fog_params": {
-				"type": "linear",
-				"start_m": 1.5,
-				"end_m": 50.5,
-				"density": 2.5
-			},	
 			"embedded_models": {
 				"embed_model_0": {
+					"model": "nxp_raceway_overpass",
+					"name": "nxp_raceway_overpass_0",
+					"pose": "0 0 -0.009 0 0 0"
+				},
+				"embed_model_1": {
 					"model": "start_point",
 					"name": "start_point_0",
 					"pose": "0.2 -0.45 0.09 0 0 0"
 				},
-				"embed_model_1": {
+				"embed_model_2": {
 					"model": "start_point",
 					"name": "start_point_1",
 					"pose": "0.2 0.45 0.09 0 0 0"
@@ -147,7 +149,9 @@
 				"sdf_version": 1.6,
 				"camera_image": "trackImage0",
 				"namespace": "cupcar0",
-				"model_name": "NotSet"
+				"model_name": "NotSet",
+				"hq_wheel": "0",
+				"hq_frame": "0"
 			}
 		}
 	}
