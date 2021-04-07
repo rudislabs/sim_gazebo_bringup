@@ -75,7 +75,7 @@
 							{"namespace": "cupcar0"}
 						]
 		},
-		"ros2_node_2":{
+		"ros2_node_1":{
 			"timing": "post-spawn",
 			"package": "rqt_image_view",
 			"executable": "rqt_image_view",
@@ -89,7 +89,11 @@
 			"executable": "line_follower",
 			"name": "line_follower_0",
 			"output": "screen",
-			"parameters": []
+			"parameters": [	{"start_delay": 10.0},
+							{"camera_vector_topic": "/cupcar0/PixyVector"},
+							{"linear_velocity": 1.5},
+							{"angular_velocity": -1.2}
+						]
 		}
 	},
 	"world_params": {
