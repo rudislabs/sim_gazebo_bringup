@@ -29,6 +29,13 @@
 				"build_package": "nxp_cup_vision",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_2":{
+				"repo": "git@github.com:rudislabs/aim_line_follow.git",
+				"version": "main",
+				"build_package": "aim_line_follow",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
 			}
 		},
 		"system": {
@@ -73,6 +80,14 @@
 			"package": "rqt_image_view",
 			"executable": "rqt_image_view",
 			"name": "rqt_image_view_0",
+			"output": "screen",
+			"parameters": []
+		},
+		"ros2_node_2":{
+			"timing": "post-spawn",
+			"package": "aim_line_follow",
+			"executable": "line_follower",
+			"name": "line_follower_0",
 			"output": "screen",
 			"parameters": []
 		}
