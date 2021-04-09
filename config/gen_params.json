@@ -35,6 +35,13 @@
 			}
 		},
 		"ros2": {
+			"ros2_repo_0":{
+				"repo": "git@github.com:rudislabs/rqt_camera_gazebo.git",
+				"version": "main",
+				"build_package": "rqt_camera_gazebo",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			}
 		},
 		"system": {
 			"connections": {
