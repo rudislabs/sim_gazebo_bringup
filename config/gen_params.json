@@ -72,7 +72,49 @@
 		"gzclient": true,
 		"gzserver": true
 	},
-	"nodes": {},
+	"nodes": {
+		"ros2_node_0":{
+			"timing": "post-spawn",
+			"package": "rqt_camera_gazebo",
+			"executable": "rqt_camera_gazebo",
+			"name": "rqt_camera_gazebo_0",
+			"output": "screen",
+			"parameters": [	{"camera_sub": "rgb_cam/image_raw"},
+							{"camera_pub": "rqt_rgb_cam/image_raw"},
+							{"camera_format": "bgr8"}
+						]
+		},
+		"ros2_node_1":{
+			"timing": "post-spawn",
+			"package": "rqt_camera_gazebo",
+			"executable": "rqt_camera_gazebo",
+			"name": "rqt_camera_gazebo_1",
+			"output": "screen",
+			"parameters": [	{"camera_sub": "realsense_d455_0_camera/image_raw"},
+							{"camera_pub": "rqt_d455/image_raw"},
+							{"camera_format": "bgr8"}
+						]
+		},
+		"ros2_node_2":{
+			"timing": "post-spawn",
+			"package": "rqt_camera_gazebo",
+			"executable": "rqt_camera_gazebo",
+			"name": "rqt_camera_gazebo_2",
+			"output": "screen",
+			"parameters": [	{"camera_sub": "realsense_d455_0_depth_camera/depth/image_raw"},
+							{"camera_pub": "rqt_d455_depth/depth"},
+							{"camera_format": "32FC1"}
+						]
+		},
+		"ros2_node_4":{
+			"timing": "post-spawn",
+			"package": "rqt_image_view",
+			"executable": "rqt_image_view",
+			"name": "rqt_image_view_0",
+			"output": "screen",
+			"parameters": []
+		}
+	},
 	"world_params": {
 		"gazebo_name": "tii_gazebo",
 		"generate_world": 1,
@@ -93,24 +135,13 @@
 				"start_m": 50,
 				"end_m": 500,
 				"density": 1
-			},			
-			"embedded_models": {
-				"embed_model_0": {
-					"model": "coke_can",
-					"name": "coke_can_0",
-					"pose": "3 3 0 0 0 0"
-				},
-				"embed_model_1": {
-					"model": "coke_can",
-					"name": "coke_can_1",
-					"pose": "3 3.1 0 0 0 0"
-				}
 			},
 			"video_widget": "NotSet",
-			"set_physics": 0,
-			"update_rate": 100,
+			"set_physics": 1,
+			"update_rate": 250,
 			"realtime_factor": 1.0,
-			"ode_threads": 2
+			"ode_iterations": 10,
+			"ode_threads": 6
 		}
 	},
 	"models": {
@@ -132,10 +163,30 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
-				"gps_attack_time": 20,
-				"gps_attack_rate": 0.2,
-				"gps_model_name": "NotSet",
-				"camera_image": "NotSet",
+				"sensors": {
+					"camera_0":{
+						"method": "include",
+						"pose": ".1 0 -.02 0 0 0",
+						"params":{
+							"base_model": "realsense_d455",
+							"model_name": "realsense_d455_0",
+							"depth_near": 0.1,
+							"depth_far": 300,
+							"depth_width": 1920,
+							"depth_height": 1080,
+							"depth_update_rate": 30,
+							"near": 0.1,
+							"far": 300,
+							"width": 1920,
+							"height": 1080,
+							"update_rate": 30
+						},
+						"joint": {
+							"type":"fixed",
+							"axis":""
+						}
+					}
+				},
 				"namespace": "NotSet",
 				"hil_mode": 0,
 				"model_name": "NotSet"
@@ -149,7 +200,7 @@
 			"instance": 1,
 			"generate_params":{
 				"controller": "px4",
-				"base_model": "standard_vtol",
+				"base_model": "iris",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4561,
 				"mavlink_udp_port": 14561,
@@ -159,11 +210,29 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
-				"gps_attack_time": 20,
-				"gps_attack_rate": 0.2,
-				"gps_model_name": "NotSet",
-				"camera_image": "NotSet",
-				"namespace": "NotSet",
+				"sensors": {
+					"camera_0":{
+						"method": "jinja2",
+						"pose": ".1 0 .05 0 0 0",
+						"inertial": "NotSet",
+						"visual": "NotSet",
+						"params":{
+							"model_name": "rgb_cam",
+							"type": "camera",
+							"near": 0.1,
+							"far": 300,
+							"hfov": 1.5,
+							"width": 1920,
+							"height": 1080,
+							"format": "R8G8B8",
+							"update_rate": 30
+						},
+						"joint": {
+							"type":"fixed",
+							"axis":""
+						}
+					}
+				},
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}

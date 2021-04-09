@@ -665,7 +665,7 @@ def generate_launch_description():
             # Spawn model in gazebo
             spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
                             arguments=['-entity', '{:s}'.format(generate_model_params["model_name"]),
-                                '-timeout', str(5.0), '-spawn_service_timeout', str(3.0), '-unpause',
+                                '-timeout', str(5.0), '-spawn_service_timeout', str(8.0), '-unpause',
                                 '-x', str(spawn_pose[0]), '-y', str(spawn_pose[1]), '-z', str(spawn_pose[2]),
                                 '-R', str(spawn_pose[3]), '-P', str(spawn_pose[4]), '-Y', str(spawn_pose[5]),
                                 '-file', '/tmp/gazebo/models/{:s}/{:s}.sdf'.format(
