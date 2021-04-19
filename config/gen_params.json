@@ -2,8 +2,8 @@
 		"autopilot": {
 			"autopilot_build_params_0": {
 				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
-				"name": "TII-Autopilot",
-				"version": "tii_v2",
+				"name": "NXP-Autopilot",
+				"version": "hgd_dev",
 				"clone": 1,
 				"source_gazebo_plugins": 0,
 				"build_type": "px4_sitl_default",
@@ -14,9 +14,9 @@
 		"gazebo": {
 			"gazebo_models": {
 				"gazebo_repo_0":{
-					"repo": "git@github.com:rudislabs/tii_gazebo.git",
-					"version": "fire_turtle",
-					"name": "tii_gazebo"
+					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
+					"version": "hgd_dev",
+					"name": "nxp_gazebo"
 				},
 				"gazebo_model_repo_1":{
 					"repo": "git@github.com:osrf/gazebo_models.git",
@@ -27,9 +27,9 @@
 			"gazebo_plugins": {
 				"gazebo_plugin_repo_0":{
 					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
-					"version": "gps_attack",
-					"name": "tii_gazebo_plugins",
-					"workspace_relative_mavlink": "TII-Autopilot/mavlink/include/",
+					"version": "master",
+					"name": "nxp_gazebo_plugins",
+					"workspace_relative_mavlink": "NXP-Autopilot/mavlink/include/",
 					"source_gazebo_plugins": 1
 				}
 			}
@@ -79,68 +79,26 @@
 		"gzclient": true,
 		"gzserver": true
 	},
-	"nodes": {
-		"ros2_node_0":{
-			"timing": "post-spawn",
-			"package": "rqt_camera_gazebo",
-			"executable": "rqt_camera_gazebo",
-			"name": "rqt_camera_gazebo_0",
-			"output": "screen",
-			"parameters": [	{"camera_sub": "rgb_cam/image_raw"},
-							{"camera_pub": "rqt_rgb_cam/image_raw"},
-							{"camera_format": "bgr8"}
-						]
-		},
-		"ros2_node_1":{
-			"timing": "post-spawn",
-			"package": "rqt_camera_gazebo",
-			"executable": "rqt_camera_gazebo",
-			"name": "rqt_camera_gazebo_1",
-			"output": "screen",
-			"parameters": [	{"camera_sub": "realsense_d455_0_camera/image_raw"},
-							{"camera_pub": "rqt_d455/image_raw"},
-							{"camera_format": "bgr8"}
-						]
-		},
-		"ros2_node_2":{
-			"timing": "post-spawn",
-			"package": "rqt_camera_gazebo",
-			"executable": "rqt_camera_gazebo",
-			"name": "rqt_camera_gazebo_2",
-			"output": "screen",
-			"parameters": [	{"camera_sub": "realsense_d455_0_depth_camera/depth/image_raw"},
-							{"camera_pub": "rqt_d455_depth/depth"},
-							{"camera_format": "32FC1"}
-						]
-		},
-		"ros2_node_4":{
-			"timing": "post-spawn",
-			"package": "rqt_image_view",
-			"executable": "rqt_image_view",
-			"name": "rqt_image_view_0",
-			"output": "screen",
-			"parameters": []
-		}
-	},
+	"nodes": {},
 	"world_params": {
-		"gazebo_name": "tii_gazebo",
+		"gazebo_name": "nxp_gazebo",
 		"generate_world": 1,
 		"generate_params":{
-			"world_name": "abu_dhabi",
+			"world_name": "canvas",
 			"sdf_version": "1.6",
 			"use_spherical_coords": 1,
-			"lat_lon_alt": [24.495296, 54.3764920, 0],
+			"lat_lon_alt": [39.8039, -84.0606, 244],
 			"sun_model": "sunUTC",
-			"sun_utc_date": "1971/12/02/08:00",
+			"sun_utc_date": "1904/09/20/17:30",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
 			"shadows": 1,
-			"cloud_speed": 12,
+			"cloud_speed": 35,
 			"wind_speed": "NotSet",
 			"fog_params": {
 				"type": "linear",
 				"start_m": 50,
-				"end_m": 500,
+				"end_m": 1000,
 				"density": 1
 			},
 			"video_widget": "NotSet",
@@ -153,14 +111,14 @@
 	},
 	"models": {
 		"model_params_0": {
-			"gazebo_name": "tii_gazebo",
-			"autopilot_name": "TII-Autopilot",
+			"gazebo_name": "nxp_gazebo",
+			"autopilot_name": "NXP-Autopilot",
 			"autopilot_build_type": "px4_sitl_default",
 			"spawn_pose": [0, 0, 0.5, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
 				"controller": "px4",
-				"base_model": "iris",
+				"base_model": "nxp_drone",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4560,
 				"mavlink_udp_port": 14560,
@@ -170,44 +128,21 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
-				"sensors": {
-					"camera_0":{
-						"method": "include",
-						"pose": ".1 0 -.02 0 0 0",
-						"params":{
-							"base_model": "realsense_d455",
-							"model_name": "realsense_d455_0",
-							"depth_near": 0.1,
-							"depth_far": 300,
-							"depth_width": 1920,
-							"depth_height": 1080,
-							"depth_update_rate": 30,
-							"near": 0.1,
-							"far": 300,
-							"width": 1920,
-							"height": 1080,
-							"update_rate": 30
-						},
-						"joint": {
-							"type":"fixed",
-							"axis":""
-						}
-					}
-				},
 				"namespace": "NotSet",
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}
 		},
 		"model_params_1": {
-			"gazebo_name": "tii_gazebo",
-			"autopilot_name": "TII-Autopilot",
+			"gazebo_name": "nxp_gazebo",
+			"autopilot_name": "NXP-Autopilot",
 			"autopilot_build_type": "px4_sitl_default",
 			"spawn_pose": [0, 2, 0.5, 0, 0, 0],
 			"instance": 1,
+			"px4_run_post": 0,
 			"generate_params":{
 				"controller": "px4",
-				"base_model": "iris",
+				"base_model": "nxp_drone",
 				"sdf_version": "NotSet",
 				"mavlink_tcp_port": 4561,
 				"mavlink_udp_port": 14561,
@@ -217,29 +152,6 @@
 				"serial_device": "/dev/ttyACM0",
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
-				"sensors": {
-					"camera_0":{
-						"method": "jinja2",
-						"pose": ".1 0 .05 0 0 0",
-						"inertial": "NotSet",
-						"visual": "NotSet",
-						"params":{
-							"model_name": "rgb_cam",
-							"type": "camera",
-							"near": 0.1,
-							"far": 300,
-							"hfov": 1.5,
-							"width": 1920,
-							"height": 1080,
-							"format": "R8G8B8",
-							"update_rate": 30
-						},
-						"joint": {
-							"type":"fixed",
-							"axis":""
-						}
-					}
-				},
 				"hil_mode": 0,
 				"model_name": "NotSet"
 			}

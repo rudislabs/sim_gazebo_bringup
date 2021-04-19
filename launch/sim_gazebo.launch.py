@@ -602,13 +602,22 @@ def generate_launch_description():
             # Command to make storage folder
             sitl_folder_cmd = ['mkdir -p \"{:s}\"'.format(sitl_output_path)]
 
-            
+
             # Set each xterm with PX4 environment variables
             px4_env = '''export PX4_SIM_MODEL=\"{:s}\"; export PX4_HOME_LAT={:s}; 
                 export PX4_HOME_LON={:s}; export PX4_HOME_ALT={:s};'''.format(
                     generate_model_params["base_model"], str(latitude_vehicle), 
                     str(longitude_vehicle), str(altitude_vehicle)
                     ).replace("\n","").replace("    ","")
+            
+            if "px4_run_post" in models[model_params]:
+                if models[model_params]["px4_run_post"] != "NotSet":
+                    # Set each xterm with PX4 environment variables
+                    px4_env = '''export PX4_SIM_MODEL=\"{:s}\"; export PX4_HOME_LAT={:s}; 
+                        export PX4_HOME_LON={:s}; export PX4_HOME_ALT={:s}; export px4_run_post={:s};'''.format(
+                            generate_model_params["base_model"], str(latitude_vehicle), 
+                            str(longitude_vehicle), str(altitude_vehicle), str(models[model_params]["px4_run_post"])
+                            ).replace("\n","").replace("    ","")
 
             # Set path for PX4 build
             px4_path = '{:s}/{:s}/build/{:s}'.format(ros2_ws,
