@@ -93,7 +93,7 @@
 			"ambient_light": 0.5,
 			"background_light": 0.15,
 			"shadows": 1,
-			"cloud_speed": 35,
+			"cloud_speed": "15",
 			"wind_speed": "NotSet",
 			"fog_params": {
 				"type": "linear",
@@ -130,7 +130,9 @@
 				"enable_lockstep": 1,
 				"namespace": "NotSet",
 				"hil_mode": 0,
-				"model_name": "NotSet"
+				"model_name": "NotSet",
+				"motor_model": "2212",
+				"prop_length": 9.0
 			}
 		},
 		"model_params_1": {
@@ -153,7 +155,9 @@
 				"serial_baudrate": 921600,
 				"enable_lockstep": 1,
 				"hil_mode": 0,
-				"model_name": "NotSet"
+				"model_name": "NotSet",
+				"motor_model": "5010",
+				"prop_length": 11.0
 			}
 		}
 	}
