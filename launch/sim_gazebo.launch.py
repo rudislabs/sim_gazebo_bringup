@@ -100,6 +100,28 @@ for repo in setup_gazebo["gazebo_models"]:
         if os.path.isdir(os.path.join(gazebo_repo_path,'models/.git')):
             os.system('rm -rf {:s}/models/.git'.format(gazebo_repo_path))
 
+    # Handle pulling large world models
+    if gazebo_repo_path.endswith("_worlds"):
+        if not os.path.isfile(str(os.path.realpath(os.path.join(gazebo_repo_path,
+            'models/.dlm')))) and os.path.isfile(str(os.path.realpath(os.path.join(gazebo_repo_path,
+            'scripts/pull_media.py')))):
+            print('''\nUpdating media files in: {:s},
+this might take a while, please be patient.
+This can also be run manually with:
+    "python3 {:s}"\n'''.format(gazebo_repo["name"],
+                    str(os.path.realpath(os.path.join(gazebo_repo_path,
+                        'scripts/pull_media.py')))))
+            dlm_cmd = 'python3 {:s}'.format(str(os.path.realpath(os.path.join(gazebo_repo_path,'scripts/pull_media.py'))))
+            dlm_cmd_popen=shlex.split(dlm_cmd)
+            dlm_popen = subprocess.Popen(dlm_cmd_popen, 
+                stdout=subprocess.PIPE, text=True)
+            while True:
+                output = dlm_popen.stdout.readline()
+                if output == '' and dlm_popen.poll() is not None:
+                    break
+                if output:
+                    print(output.strip())
+            dlm_popen.wait()
 
     # Check to see if Gazebo model path environment variable is reset yet, if not reset to avoid other models
     if not has_reset_gazebo_model_env:
@@ -439,6 +461,50 @@ if overide_gazebo:
     gazebo_popen = subprocess.Popen(gazebo_cmd_popen, 
         stdout=subprocess.PIPE, text=True)
 
+
+########################################################################################
+
+# Generate model files
+for model_params in models:
+
+    generate_model_params = models[model_params]["generate_params"]
+    instance = int(models[model_params]["instance"])
+
+    # Assign unique model name if not explicitly set in JSON
+    if generate_model_params["model_name"] == "NotSet":
+        generate_model_params["model_name"] = 'sitl_{:s}_{:d}'.format(
+            generate_model_params["base_model"], instance)
+
+    # Set vehicle controller
+    if "controller" not in generate_model_params:
+        generate_model_params["controller"] = default_controller
+    
+    generate_model_params["controller"] = str(generate_model_params["controller"]).upper()
+
+    # Reset model generation args and pull new ones from JSON
+    generate_model_args = ""
+    for params in generate_model_params:
+        generate_model_args += ' --{:s} "{:s}"'.format(
+            params, str(generate_model_params[params]))
+
+    # Model generation command using scripts/jinja_model_gen.py
+    generate_model_cmd = 'python3 {:s}/{:s}/scripts/jinja_model_gen.py{:s}'.format(
+        ros2_ws, models[model_params]["gazebo_name"], 
+        generate_model_args).replace("\n","").replace("    ","")
+
+    if debug_verbose:
+        print('\nGenerating model with: {:s}\n'.format(generate_model_cmd))
+    model_cmd_popen=shlex.split(generate_model_cmd)
+    model_popen = subprocess.Popen(model_cmd_popen, stdout=subprocess.PIPE, text=True)
+    while True:
+        output = model_popen.stdout.readline()
+        if output == '' and model_popen.poll() is not None:
+            break
+        if output:
+            print(output.strip())
+    model_popen.wait()
+
+
 ########################################################################################
 
 def generate_launch_description():
@@ -520,21 +586,22 @@ def generate_launch_description():
             generate_model_params["model_name"] = 'sitl_{:s}_{:d}'.format(
                 generate_model_params["base_model"], instance)
 
+        # Set vehicle controller
         if "controller" not in generate_model_params:
             generate_model_params["controller"] = default_controller
         
         generate_model_params["controller"] = str(generate_model_params["controller"]).upper()
 
         # Reset model generation args and pull new ones from JSON
-        generate_model_args = ""
-        for params in generate_model_params:
-            generate_model_args += ' --{:s} "{:s}"'.format(
-                params, str(generate_model_params[params]))
+        # generate_model_args = ""
+        # for params in generate_model_params:
+        #     generate_model_args += ' --{:s} "{:s}"'.format(
+        #         params, str(generate_model_params[params]))
 
-        # Model generation command using scripts/jinja_model_gen.py
-        generate_model = ['python3 {:s}/{:s}/scripts/jinja_model_gen.py{:s}'.format(
-            ros2_ws, models[model_params]["gazebo_name"], 
-            generate_model_args).replace("\n","").replace("    ","")]
+        # # Model generation command using scripts/jinja_model_gen.py
+        # generate_model = ['python3 {:s}/{:s}/scripts/jinja_model_gen.py{:s}'.format(
+        #     ros2_ws, models[model_params]["gazebo_name"], 
+        #     generate_model_args).replace("\n","").replace("    ","")]
 
         # Calculate spawn locations
         spawn_pose = models[model_params]["spawn_pose"]
@@ -544,13 +611,13 @@ def generate_launch_description():
         altitude_vehicle = float(altitude) + float(spawn_pose[2])
 
         # Execute jinja generator
-        jinja_model_generate = ExecuteProcess(
-            cmd=generate_model,
-            name='jinja_gen_{:s}'.format(generate_model_params["model_name"]),
-            shell=True,
-            output='screen')
+        # jinja_model_generate = ExecuteProcess(
+        #     cmd=generate_model,
+        #     name='jinja_gen_{:s}'.format(generate_model_params["model_name"]),
+        #     shell=True,
+        #     output='screen')
 
-        ld.add_action(jinja_model_generate)
+        # ld.add_action(jinja_model_generate)
 
 
         if str(generate_model_params["controller"]) == "PX4":

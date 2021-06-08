@@ -27,11 +27,6 @@
 					"repo": "git@github.com:rudislabs/nxp_gazebo_worlds.git",
 					"version": "main",
 					"name": "nxp_gazebo_worlds"
-				},
-				"gazebo_model_repo_3":{
-					"repo": "git@github.com:rudislabs/rudislabs_gazebo_worlds.git",
-					"version": "main",
-					"name": "rudislabs_gazebo_worlds"
 				}
 			},
 			"gazebo_plugins": {
@@ -84,15 +79,15 @@
 	},
 	"nodes": {},
 	"world_params": {
-		"gazebo_name": "rudislabs_gazebo_worlds",
+		"gazebo_name": "nxp_gazebo_lfs",
 		"generate_world": 1,
 		"generate_params":{
-			"world_name": "empty",
+			"world_name": "eindhoven",
 			"sdf_version": "1.7",
 			"use_spherical_coords": 1,
-			"lat_lon_alt": [39.760375, -84.141110, 225.0],
+			"lat_lon_alt": [51.4287125, 5.4731848, 17.0],
 			"sun_model": "sunUTC",
-			"sun_utc_date": "2020/06/20/18:00",
+			"sun_utc_date": "2020/06/20/12:00",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
 			"shadows": 0,
@@ -117,7 +112,7 @@
 			"gazebo_name": "nxp_gazebo",
 			"autopilot_name": "NXP-Autopilot",
 			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 0, 0, 0, 0, 0],
+			"spawn_pose": [-730, -1690, 0.5, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
 				"controller": "px4",
