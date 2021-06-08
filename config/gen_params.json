@@ -1,64 +1,44 @@
 {	"setup":{
-		"autopilot": {
-			"autopilot_build_params_0": {
-				"repo": "git@github.com:rudislabs/PX4-Autopilot.git",
-				"name": "NXP-Autopilot",
-				"version": "hgd_dev",
-				"clone": 1,
-				"source_gazebo_plugins": 0,
-				"build_type": "px4_sitl_default",
-				"build_prefix": "DONT_RUN=1",
-				"build_postfix": ""
-			}
-		},
+		"autopilot": {},
 		"gazebo": {
 			"gazebo_models": {
-				"gazebo_repo_0":{
+				"gazebo_model_repo_0":{
 					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
-					"version": "hgd_dev",
+					"version": "aim",
 					"name": "nxp_gazebo"
 				},
 				"gazebo_model_repo_1":{
 					"repo": "git@github.com:osrf/gazebo_models.git",
 					"version": "master",
 					"name": "osrf/models"
-				},
-				"gazebo_model_repo_2":{
-					"repo": "git@github.com:rudislabs/nxp_gazebo_worlds.git",
-					"version": "main",
-					"name": "nxp_gazebo_worlds"
-				},
-				"gazebo_model_repo_3":{
-					"repo": "git@github.com:rudislabs/rudislabs_gazebo_worlds.git",
-					"version": "main",
-					"name": "rudislabs_gazebo_worlds"
 				}
 			},
-			"gazebo_plugins": {
-				"gazebo_plugin_repo_0":{
-					"repo": "git@github.com:rudislabs/PX4-SITL_gazebo.git",
-					"version": "master",
-					"name": "nxp_gazebo_plugins",
-					"workspace_relative_mavlink": "NXP-Autopilot/mavlink/include/",
-					"source_gazebo_plugins": 1
-				}
-			}
+			"gazebo_plugins": {}
 		},
 		"ros2": {
+			"ros2_repo_0":{
+				"repo": "git@github.com:rudislabs/nxp_cup_interfaces.git",
+				"version": "aim",
+				"build_package": "nxp_cup_interfaces",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_1":{
+				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
+				"version": "aim",
+				"build_package": "nxp_cup_vision",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_2":{
+				"repo": "git@github.com:rudislabs/aim_line_follow.git",
+				"version": "main",
+				"build_package": "aim_line_follow",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			}
 		},
 		"system": {
-			"connections": {
-				"connection_0":{
-					"force_unbind": true,
-					"transport": "udp",
-					"ports": [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
-				},
-				"connection_1":{
-					"force_unbind": false,
-					"transport": "tcp",
-					"ports": []
-				}
-			},
 			"set_environment": {
 				"environment_0": {
 					"variable": "GAZEBO_MODEL_DATABASE_URI",
@@ -71,9 +51,9 @@
 					"method": "prepend"
 				},
 				"environment_2": {
-					"variable": "JAVA_HOME",
-					"value": "/usr/lib/jvm/java-8-openjdk-amd64/",
-					"method": "ignore"
+					"variable": "GAZEBO_PLUGIN_PATH",
+					"value": "/opt/ros/foxy/lib",
+					"method": "prepend"
 				}
 			}
 		}
@@ -82,84 +62,96 @@
 		"gzclient": true,
 		"gzserver": true
 	},
-	"nodes": {},
+	"nodes": {
+		"ros2_node_0":{
+			"timing": "post-spawn",
+			"package": "nxp_cup_vision",
+			"executable": "nxp_track_vision",
+			"name": "nxp_track_vision_0",
+			"output": "screen",
+			"parameters": [	{"pyramid_down": 3},
+							{"camera_image": "trackImage0"},
+							{"debug_image": "debugImage0"},
+							{"namespace": "cupcar0"},
+							{"mask_ratio_array": [1.0, 0.4]}
+
+						]
+		},
+		"ros2_node_1":{
+			"timing": "post-spawn",
+			"package": "rqt_image_view",
+			"executable": "rqt_image_view",
+			"name": "rqt_image_view_0",
+			"output": "screen",
+			"parameters": []
+		},
+		"ros2_node_2":{
+			"timing": "post-spawn",
+			"package": "aim_line_follow",
+			"executable": "line_follower",
+			"name": "line_follower_0",
+			"output": "screen",
+			"parameters": [	{"start_delay": 5.0},
+							{"camera_vector_topic": "/cupcar0/PixyVector"},
+							{"linear_velocity": 2.0},
+							{"angular_velocity": -0.8},
+							{"single_line_steer_scale": 0.6}
+						]
+		}
+	},
 	"world_params": {
-		"gazebo_name": "rudislabs_gazebo_worlds",
+		"gazebo_name": "nxp_gazebo",
 		"generate_world": 1,
 		"generate_params":{
-			"world_name": "empty",
-			"sdf_version": "1.7",
+			"world_name": "canvas",
+			"sdf_version": "1.6",
 			"use_spherical_coords": 1,
-			"lat_lon_alt": [39.760375, -84.141110, 225.0],
+			"lat_lon_alt": [28.6139, -77.2090, 100],
 			"sun_model": "sunUTC",
-			"sun_utc_date": "2020/06/20/18:00",
+			"sun_utc_date": "now",
 			"ambient_light": 0.5,
 			"background_light": 0.15,
 			"shadows": 0,
 			"cloud_speed": 12,
 			"wind_speed": "NotSet",
-			"fog_params": {
-				"type": "linear",
-				"start_m": 500,
-				"end_m": 5000,
-				"density": 1
+			"embedded_models": {
+				"embed_model_0": {
+					"model": "nxp_raceway_overpass",
+					"name": "nxp_raceway_overpass_0",
+					"pose": "0 0 -0.009 0 0 0"
+				},
+				"embed_model_1": {
+					"model": "start_point",
+					"name": "start_point_0",
+					"pose": "0.2 -0.45 0.09 0 0 0"
+				},
+				"embed_model_2": {
+					"model": "start_point",
+					"name": "start_point_1",
+					"pose": "0.2 0.45 0.09 0 0 0"
+				}
 			},
 			"video_widget": "NotSet",
-			"set_physics": 1,
-			"update_rate": 250,
+			"set_physics": 0,
+			"update_rate": 100,
 			"realtime_factor": 1.0,
-			"ode_iterations": 10,
-			"ode_threads": 6
+			"ode_threads": 2
 		}
 	},
 	"models": {
 		"model_params_0": {
 			"gazebo_name": "nxp_gazebo",
-			"autopilot_name": "NXP-Autopilot",
-			"autopilot_build_type": "px4_sitl_default",
-			"spawn_pose": [0, 0, 0, 0, 0, 0],
+			"spawn_pose": [0, 0, 0.1, 0, 0, 0],
 			"instance": 0,
 			"generate_params":{
-				"controller": "px4",
-				"base_model": "nxp_drone",
-				"sdf_version": "NotSet",
-				"mavlink_tcp_port": 4560,
-				"mavlink_udp_port": 14560,
-				"qgc_udp_port": 14550,
-				"sdk_udp_port": 14540,
-				"serial_enabled": 0,
-				"serial_device": "/dev/ttyACM0",
-				"serial_baudrate": 921600,
-				"enable_lockstep": 1,
-				"sensors": {
-					"camera_0":{
-						"method": "include",
-						"pose": ".15 0 .015 0 .25 0",
-						"params":{
-							"base_model": "realsense_d455",
-							"model_name": "realsense_d455_0",
-							"depth_near": 0.1,
-							"depth_far": 3000,
-							"depth_width": 320,
-							"depth_height": 240,
-							"depth_update_rate": 15,
-							"near": 0.1,
-							"far": 3000,
-							"width": 1280,
-							"height": 720,
-							"update_rate": 15
-						},
-						"joint": {
-							"type":"fixed",
-							"axis":""
-						}
-					}
-				},
-				"namespace": "NotSet",
-				"hil_mode": 0,
+				"controller": "ros2",
+				"base_model": "nxp_cupcar",
+				"sdf_version": 1.6,
+				"camera_image": "trackImage0",
+				"namespace": "cupcar0",
 				"model_name": "NotSet",
-				"motor_model": "2212",
-				"prop_length": 9.0
+				"hq_wheel": "0",
+				"hq_frame": "0"
 			}
 		}
 	}
