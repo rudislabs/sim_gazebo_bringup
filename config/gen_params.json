@@ -4,7 +4,7 @@
 			"gazebo_models": {
 				"gazebo_model_repo_0":{
 					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
-					"version": "aim",
+					"version": "fire_turtle",
 					"name": "nxp_gazebo"
 				},
 				"gazebo_model_repo_1":{
@@ -69,7 +69,7 @@
 			"executable": "nxp_track_vision",
 			"name": "nxp_track_vision_0",
 			"output": "screen",
-			"parameters": [	{"pyramid_down": 3},
+			"parameters": [	{"pyramid_down": 0},
 							{"camera_image": "trackImage0"},
 							{"debug_image": "debugImage0"},
 							{"namespace": "cupcar0"},
@@ -93,8 +93,8 @@
 			"output": "screen",
 			"parameters": [	{"start_delay": 5.0},
 							{"camera_vector_topic": "/cupcar0/PixyVector"},
-							{"linear_velocity": 2.0},
-							{"angular_velocity": -0.8},
+							{"linear_velocity": 1.5},
+							{"angular_velocity": -0.6},
 							{"single_line_steer_scale": 0.6}
 						]
 		}
@@ -116,8 +116,8 @@
 			"wind_speed": "NotSet",
 			"embedded_models": {
 				"embed_model_0": {
-					"model": "nxp_raceway_overpass",
-					"name": "nxp_raceway_overpass_0",
+					"model": "nxp_raceway_octagon",
+					"name": "nxp_raceway_octagon_0",
 					"pose": "0 0 -0.009 0 0 0"
 				},
 				"embed_model_1": {
