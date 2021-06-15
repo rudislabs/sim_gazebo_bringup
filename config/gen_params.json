@@ -4,7 +4,7 @@
 			"gazebo_models": {
 				"gazebo_model_repo_0":{
 					"repo": "git@github.com:rudislabs/nxp_gazebo.git",
-					"version": "fire_turtle",
+					"version": "nxp-summer",
 					"name": "nxp_gazebo"
 				},
 				"gazebo_model_repo_1":{
@@ -30,7 +30,7 @@
 			},
 			"ros2_repo_1":{
 				"repo": "git@github.com:rudislabs/nxp_cup_vision.git",
-				"version": "aim",
+				"version": "nxp-summer",
 				"build_package": "nxp_cup_vision",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
@@ -130,7 +130,7 @@
 		"generate_world": 1,
 		"generate_params":{
 			"world_name": "canvas",
-			"sdf_version": "1.6",
+			"sdf_version": "1.7",
 			"use_spherical_coords": 1,
 			"lat_lon_alt": [28.6139, -77.2090, 100],
 			"sun_model": "sunUTC",
@@ -156,7 +156,7 @@
 			"set_physics": 0,
 			"update_rate": 100,
 			"realtime_factor": 1.0,
-			"ode_threads": 2
+			"ode_threads": 4
 		}
 	},
 	"models": {
@@ -167,10 +167,28 @@
 			"generate_params":{
 				"controller": "ros2",
 				"base_model": "nxp_cupcar",
-				"sdf_version": 1.6,
-				"camera_image": "trackImage0",
+				"sdf_version": 1.7,
 				"namespace": "cupcar0",
 				"model_name": "NotSet",
+				"sensors": {
+					"camera_0":{
+						"method": "include",
+						"pose": "-.09 0 .35 0 1.0 0",
+						"params":{
+							"base_model": "pixy2_cmucam5",
+							"model_name": "pixy2_cmucam5_0",
+							"near": 0.05,
+							"far": 300,
+							"width": 196,
+							"height": 117,
+							"update_rate": 30
+						},
+						"joint": {
+							"type":"fixed",
+							"axis":""
+						}
+					}
+				},
 				"hq_wheel": "0",
 				"hq_frame": "0"
 			}

@@ -592,32 +592,12 @@ def generate_launch_description():
         
         generate_model_params["controller"] = str(generate_model_params["controller"]).upper()
 
-        # Reset model generation args and pull new ones from JSON
-        # generate_model_args = ""
-        # for params in generate_model_params:
-        #     generate_model_args += ' --{:s} "{:s}"'.format(
-        #         params, str(generate_model_params[params]))
-
-        # # Model generation command using scripts/jinja_model_gen.py
-        # generate_model = ['python3 {:s}/{:s}/scripts/jinja_model_gen.py{:s}'.format(
-        #     ros2_ws, models[model_params]["gazebo_name"], 
-        #     generate_model_args).replace("\n","").replace("    ","")]
-
         # Calculate spawn locations
         spawn_pose = models[model_params]["spawn_pose"]
         latitude_vehicle = float(latitude) + ((float(spawn_pose[1])/6378137.0)*(180.0/np.pi))
         longitude_vehicle = float(longitude) + ((float(spawn_pose[0])/
             (6378137.0*np.cos((np.pi*float(latitude))/180.0)))*(180.0/np.pi))
         altitude_vehicle = float(altitude) + float(spawn_pose[2])
-
-        # Execute jinja generator
-        # jinja_model_generate = ExecuteProcess(
-        #     cmd=generate_model,
-        #     name='jinja_gen_{:s}'.format(generate_model_params["model_name"]),
-        #     shell=True,
-        #     output='screen')
-
-        # ld.add_action(jinja_model_generate)
 
 
         if str(generate_model_params["controller"]) == "PX4":
