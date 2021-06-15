@@ -11,6 +11,11 @@
 					"repo": "git@github.com:osrf/gazebo_models.git",
 					"version": "master",
 					"name": "osrf/models"
+				},
+				"gazebo_model_repo_2":{
+					"repo": "git@github.com:NXPHoverGames/gazebo_apriltag.git",
+					"version": "master",
+					"name": "gazebo_apriltag"
 				}
 			},
 			"gazebo_plugins": {}
@@ -32,8 +37,29 @@
 			},
 			"ros2_repo_2":{
 				"repo": "git@github.com:rudislabs/aim_line_follow.git",
-				"version": "main",
+				"version": "nxp_summer",
 				"build_package": "aim_line_follow",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_3":{
+				"repo": "git@github.com:christianrauch/apriltag.git",
+				"version": "master",
+				"build_package": "apriltag",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_4":{
+				"repo": "git@github.com:christianrauch/apriltag_msgs.git",
+				"version": "master",
+				"build_package": "apriltag_msgs",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_5":{
+				"repo": "git@github.com:NXPHoverGames/apriltag_ros.git",
+				"version": "master",
+				"build_package": "apriltag_ros",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
 			}
@@ -121,14 +147,9 @@
 					"pose": "0 0 -0.009 0 0 0"
 				},
 				"embed_model_1": {
-					"model": "start_point",
-					"name": "start_point_0",
-					"pose": "0.2 -0.45 0.09 0 0 0"
-				},
-				"embed_model_2": {
-					"model": "start_point",
-					"name": "start_point_1",
-					"pose": "0.2 0.45 0.09 0 0 0"
+					"model": "Apriltag36_11_00000",
+					"name": "Apriltag36_11_00000_0",
+					"pose": "0.33 0 0 0 0 0"
 				}
 			},
 			"video_widget": "NotSet",
