@@ -96,7 +96,7 @@
 			"name": "nxp_track_vision_0",
 			"output": "screen",
 			"parameters": [	{"pyramid_down": 0},
-							{"camera_image": "trackImage0"},
+							{"camera_image": "pixy2_cmucam5_0"},
 							{"debug_image": "debugImage0"},
 							{"namespace": "cupcar0"},
 							{"mask_ratio_array": [1.0, 0.4]}
