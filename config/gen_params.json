@@ -36,9 +36,9 @@
 				"build_postfix": "--symlink-install"
 			},
 			"ros2_repo_2":{
-				"repo": "git@github.com:rudislabs/aim_line_follow.git",
-				"version": "nxp_summer",
-				"build_package": "aim_line_follow",
+				"repo": "git@github.com:rudislabs/aim_line_follow_c.git",
+				"version": "main",
+				"build_package": "aim_line_follow_c",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
 			},
@@ -113,8 +113,8 @@
 		},
 		"ros2_node_2":{
 			"timing": "post-spawn",
-			"package": "aim_line_follow",
-			"executable": "line_follower",
+			"package": "aim_line_follow_c",
+			"executable": "aim_line_follow_c",
 			"name": "line_follower_0",
 			"output": "screen",
 			"parameters": [	{"start_delay": 5.0},
@@ -179,8 +179,8 @@
 							"model_name": "pixy2_cmucam5_0",
 							"near": 0.05,
 							"far": 300,
-							"width": 196,
-							"height": 117,
+							"width": 156,
+							"height": 102,
 							"update_rate": 30
 						},
 						"joint": {
