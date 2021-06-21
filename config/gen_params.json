@@ -113,6 +113,14 @@
 		},
 		"ros2_node_2":{
 			"timing": "post-spawn",
+			"package": "apriltag_ros",
+			"executable": "apriltag_node",
+			"name": "rqt_image_view_0",
+			"output": "screen",
+			"parameters": []
+		},
+		"ros2_node_3":{
+			"timing": "post-spawn",
 			"package": "aim_line_follow_c",
 			"executable": "aim_line_follow_c",
 			"name": "line_follower_0",
