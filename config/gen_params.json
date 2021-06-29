@@ -125,7 +125,7 @@
 			"output": "screen",
 			"parameters": [{"start_delay": 5.0},
 					{"camera_vector_topic": "/cupcar0/PixyVector"},
-					{"linear_velocity": 0.5},
+					{"linear_velocity": 0.8},
 					{"angular_velocity": -0.6},
 					{"single_line_steer_scale": 0.6}]
 		}
@@ -147,9 +147,9 @@
 			"wind_speed": "NotSet",
 			"embedded_models": {
 				"embed_model_0": {
-					"model": "nxp_raceway_2",
-					"name": "nxp_raceway_2_0",
-					"pose": "-1.4277 -0.26 -0.0037 0 0 0"
+					"model": "nxp_raceway_octagon",
+					"name": "nxp_raceway_octagon_0",
+					"pose": "0 0 -0.009 0 0 0"
 				},
 				"embed_model_1": {
 					"model": "Apriltag36_11_00000",
