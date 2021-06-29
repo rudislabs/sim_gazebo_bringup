@@ -95,13 +95,11 @@
 			"executable": "nxp_track_vision",
 			"name": "nxp_track_vision_0",
 			"output": "screen",
-			"parameters": [	{"pyramid_down": 0},
-							{"camera_image": "pixy2_cmucam5_0"},
-							{"debug_image": "debugImage0"},
-							{"namespace": "cupcar0"},
-							{"mask_ratio_array": [1.0, 0.4]}
-
-						]
+			"parameters": [{"pyramid_down": 0},
+					{"camera_image": "pixy2_cmucam5_0"},
+					{"debug_image": "debugImage0"},
+					{"namespace": "cupcar0"},
+					{"mask_ratio_array": [0.33, 0.4]}]
 		},
 		"ros2_node_1":{
 			"timing": "post-spawn",
@@ -125,12 +123,11 @@
 			"executable": "aim_line_follow_c",
 			"name": "line_follower_0",
 			"output": "screen",
-			"parameters": [	{"start_delay": 5.0},
-							{"camera_vector_topic": "/cupcar0/PixyVector"},
-							{"linear_velocity": 1.5},
-							{"angular_velocity": -0.6},
-							{"single_line_steer_scale": 0.6}
-						]
+			"parameters": [{"start_delay": 5.0},
+					{"camera_vector_topic": "/cupcar0/PixyVector"},
+					{"linear_velocity": 0.5},
+					{"angular_velocity": -0.6},
+					{"single_line_steer_scale": 0.6}]
 		}
 	},
 	"world_params": {
@@ -150,14 +147,19 @@
 			"wind_speed": "NotSet",
 			"embedded_models": {
 				"embed_model_0": {
-					"model": "nxp_raceway_octagon",
-					"name": "nxp_raceway_octagon_0",
-					"pose": "0 0 -0.009 0 0 0"
+					"model": "nxp_raceway_2",
+					"name": "nxp_raceway_2_0",
+					"pose": "-1.4277 -0.26 -0.0037 0 0 0"
 				},
 				"embed_model_1": {
 					"model": "Apriltag36_11_00000",
 					"name": "Apriltag36_11_00000_0",
-					"pose": "0.33 0 0 0 0 0"
+					"pose": "-1.255 10.45 0 0 0 -0.7859"
+				},
+				"embed_model_2": {
+					"model": "stop_sign",
+					"name": "stop_sign_0",
+					"pose": "-1.497 9.107 -0.907 0 0 2.3833"
 				}
 			},
 			"video_widget": "NotSet",
@@ -185,6 +187,7 @@
 						"params":{
 							"base_model": "pixy2_cmucam5",
 							"model_name": "pixy2_cmucam5_0",
+							"hfov": 30,
 							"near": 0.05,
 							"far": 300,
 							"width": 156,
