@@ -160,6 +160,16 @@
 					"model": "stop_sign",
 					"name": "stop_sign_0",
 					"pose": "-1.497 9.107 -0.907 0 0 2.3833"
+				},
+				"embed_model_3": {
+					"model": "start_point",
+					"name": "start_point_0",
+					"pose": "1.104676 -0.385091 -0.081835 0 0 2.3833"
+				},
+				"embed_model_4": {
+					"model": "start_point",
+					"name": "start_point_1",
+					"pose": "1.106250 0.384252 -0.085029 0 0 2.3833"
 				}
 			},
 			"video_widget": "NotSet",
