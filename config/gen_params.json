@@ -62,6 +62,13 @@
 				"build_package": "apriltag_ros",
 				"build_prefix": "--packages-select",
 				"build_postfix": "--symlink-install"
+			},
+			"ros2_repo_6":{
+				"repo": "git@github.com:rudislabs/aim_line_follow.git",
+				"version": "nxp_summer",
+				"build_package": "aim_line_follow",
+				"build_prefix": "--packages-select",
+				"build_postfix": "--symlink-install"
 			}
 		},
 		"system": {
