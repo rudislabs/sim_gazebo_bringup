@@ -49,7 +49,7 @@ if clean_start:
     os.system("rm -rf /tmp/px4*")
 
 # Open JSON configuration file
-with open('{:s}/gen_params_milestone3.json'.format(json_path)) as json_file:
+with open('{:s}/gen_params_milestone4.json'.format(json_path)) as json_file:
     json_params = json.load(json_file)
 
 # Setup related configs
