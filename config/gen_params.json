@@ -13,7 +13,7 @@
 					"name": "osrf/models"
 				},
 				"gazebo_model_repo_2":{
-					"repo": "git@github.com:NXPHoverGames/gazebo_apriltag.git",
+					"repo": "git@github.com:koide3/gazebo_apriltag.git",
 					"version": "master",
 					"name": "gazebo_apriltag"
 				}
@@ -57,7 +57,7 @@
 				"build_postfix": "--symlink-install"
 			},
 			"ros2_repo_5":{
-				"repo": "git@github.com:NXPHoverGames/apriltag_ros.git",
+				"repo": "git@github.com:christianrauch/apriltag_ros.git",
 				"version": "master",
 				"build_package": "apriltag_ros",
 				"build_prefix": "--packages-select",
